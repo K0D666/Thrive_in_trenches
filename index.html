@@ -3,158 +3,272 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roddcoach · UT2 Engine Builder</title>
+<title>Roddcoach · Road to 6:40</title>
 <style>
   :root{
-    --paper:#f7f3ec; --ink:#211d17; --muted:#6b6256;
-    --line:#e2d9c9; --card:#fffdf8;
-    --teal:#1f5a56; --teal-soft:#e4efed;
-    --clay:#b4542f; --clay-soft:#f6e7df;
-    --green:#3f7d54; --amber:#c98a21; --red:#b23b3b;
-    --blue:#2d6a8f;
+    --bg:#13110d; --panel:#1c1913; --panel2:#232017; --line:#332e23;
+    --text:#ece6d8; --muted:#9b9280; --faint:#6f6959;
+    --gold:#d79a3e; --gold-soft:#3a2e16;
+    --teal:#4fa79a; --teal-soft:#16302c;
+    --green:#67b07a; --amber:#dba93f; --red:#d4625a;
+    --blue:#5c93b8;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
-  h1,h2,h3{font-family:Georgia,Cambria,"Times New Roman",serif;font-weight:600;letter-spacing:-.01em}
-  header{padding:28px 20px 18px;border-bottom:1px solid var(--line);background:var(--card)}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
-  header h1{margin:0;font-size:1.9rem;color:var(--teal)}
-  header p{margin:4px 0 0;color:var(--muted);font-size:.95rem}
-  nav{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);
-    display:flex;flex-wrap:wrap;gap:2px;padding:6px 20px;max-width:1000px;margin:0 auto}
-  nav button{border:0;background:transparent;color:var(--muted);padding:10px 14px;border-radius:8px;
-    cursor:pointer;font-size:.92rem;font-weight:600}
-  nav button.active{background:var(--teal);color:#fff}
-  main{max-width:1000px;margin:24px auto;padding:0 20px}
-  .tab{display:none} .tab.active{display:block}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
-  .card h2{margin:0 0 4px;font-size:1.25rem}
-  .card .sub{color:var(--muted);font-size:.88rem;margin:0 0 14px}
-  label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin:0 0 4px;text-transform:uppercase;letter-spacing:.03em}
-  input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
-    background:#fff;font-size:.95rem;color:var(--ink);font-family:inherit}
-  textarea{min-height:52px;resize:vertical}
-  .grid{display:grid;gap:14px}
-  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:1fr 1fr 1fr} .g4{grid-template-columns:repeat(4,1fr)}
-  @media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
-  button.act{background:var(--clay);color:#fff;border:0;padding:10px 16px;border-radius:9px;font-weight:600;cursor:pointer;font-size:.92rem}
-  button.ghost{background:transparent;color:var(--teal);border:1px solid var(--teal)}
-  button.tiny{padding:4px 9px;font-size:.78rem;border-radius:7px}
-  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;
+    background-image:radial-gradient(900px 400px at 85% -8%, #241f16 0%, transparent 60%)}
+  h1,h2,h3{font-family:Georgia,Cambria,serif;font-weight:600;letter-spacing:-.01em;margin:0}
+  header{padding:26px 20px 16px;border-bottom:1px solid var(--line)}
+  .wrap,nav,main{max-width:1040px;margin:0 auto}
+  header h1{font-size:1.75rem;color:var(--gold)}
+  header p{margin:5px 0 0;color:var(--muted);font-size:.92rem}
+  nav{display:flex;flex-wrap:wrap;gap:4px;padding:8px 16px;position:sticky;top:0;z-index:20;
+    background:rgba(19,17,13,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav button{border:0;background:transparent;color:var(--muted);padding:9px 14px;border-radius:9px;
+    cursor:pointer;font-size:.9rem;font-weight:600}
+  nav button:hover{color:var(--text)}
+  nav button.active{background:var(--gold);color:#1a1509}
+  main{padding:22px 20px 60px}
+  .tab{display:none}.tab.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px}
+  .card h2{font-size:1.2rem;color:var(--text)}
+  .card .sub{color:var(--muted);font-size:.86rem;margin:3px 0 15px}
+  label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin:0 0 5px;text-transform:uppercase;letter-spacing:.05em}
+  input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:10px;
+    background:var(--panel2);font-size:.95rem;color:var(--text);font-family:inherit}
+  input::placeholder{color:var(--faint)}
+  textarea{min-height:56px;resize:vertical}
+  .grid{display:grid;gap:13px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+  @media(max-width:700px){.g2,.g3,.g4,.g5{grid-template-columns:1fr 1fr}}
+  @media(max-width:460px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
+  button.act{background:var(--gold);color:#1a1509;border:0;padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.9rem}
+  button.act:hover{filter:brightness(1.08)}
+  button.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+  button.tiny{padding:4px 9px;font-size:.76rem;border-radius:8px}
+  .row-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  table{width:100%;border-collapse:collapse;font-size:.86rem}
   th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}
-  th{font-size:.73rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-  tr:hover td{background:var(--teal-soft)}
-  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.74rem;font-weight:700}
+  th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  tr:hover td{background:var(--panel2)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:700;white-space:nowrap}
   .p-ut2{background:var(--teal-soft);color:var(--teal)}
-  .p-at{background:#fbf0d8;color:var(--amber)}
-  .p-spd{background:var(--clay-soft);color:var(--clay)}
-  .big{font-size:2.3rem;font-family:Georgia,serif;color:var(--teal);line-height:1}
-  .metric{background:var(--teal-soft);border-radius:12px;padding:14px}
-  .metric .big{font-size:1.7rem}
-  .metric small{display:block;color:var(--muted);text-transform:uppercase;font-size:.7rem;letter-spacing:.05em;margin-bottom:4px;font-weight:700}
-  .verdict{border-radius:12px;padding:16px;margin-top:14px;font-weight:600}
-  .v-green{background:#e7f1e9;color:var(--green);border:1px solid #bcd9c3}
-  .v-amber{background:#fbf2dc;color:var(--amber);border:1px solid #ecd79c}
-  .v-red{background:#f7e3e3;color:var(--red);border:1px solid #e3b6b6}
-  .note{font-size:.84rem;color:var(--muted);background:var(--clay-soft);border-left:3px solid var(--clay);padding:10px 12px;border-radius:0 8px 8px 0;margin-top:12px}
-  .wk{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
-  .wk summary{cursor:pointer;padding:11px 14px;font-weight:700;background:#fcf8f0;list-style:none}
-  .wk summary::-webkit-details-marker{display:none}
-  .wk[open] summary{border-bottom:1px solid var(--line)}
-  .wk .body{padding:12px 14px;font-size:.9rem}
-  .wk .body div{padding:3px 0;border-bottom:1px dotted var(--line)}
-  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-  .subtabs button{background:#fcf8f0;border:1px solid var(--line);color:var(--muted);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85rem}
-  .subtabs button.active{background:var(--clay);color:#fff;border-color:var(--clay)}
+  .p-lut2{background:#17323a;color:var(--blue)}
+  .p-at{background:#3a3115;color:var(--amber)}
+  .p-spd{background:#3b2414;color:#e08a5a}
+  .p-str{background:#2c2436;color:#b79ad6}
+  .p-tt{background:#3a1b1b;color:var(--red)}
+  .metric{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:15px}
+  .metric small{display:block;color:var(--muted);text-transform:uppercase;font-size:.66rem;letter-spacing:.06em;margin-bottom:6px;font-weight:700}
+  .metric .big{font-size:1.7rem;font-family:Georgia,serif;color:var(--gold);line-height:1}
+  .verdict{border-radius:13px;padding:15px;margin-top:14px;font-weight:600;font-size:.92rem}
+  .v-green{background:#17291c;color:#8fd3a0;border:1px solid #2c4a34}
+  .v-amber{background:#2e2611;color:#ecc569;border:1px solid #4c4020}
+  .v-red{background:#2e1715;color:#ec8b84;border:1px solid #522a27}
+  .note{font-size:.83rem;color:var(--muted);background:var(--gold-soft);border-left:3px solid var(--gold);padding:10px 13px;border-radius:0 9px 9px 0;margin-top:13px}
+  .alert{font-size:.9rem;background:#2e1715;border:1px solid #522a27;color:#ec8b84;border-radius:13px;padding:15px;margin-bottom:18px;font-weight:600}
+  details.wk{border:1px solid var(--line);border-radius:12px;margin-bottom:9px;overflow:hidden;background:var(--panel)}
+  details.wk summary{cursor:pointer;padding:12px 15px;font-weight:700;background:var(--panel2);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  details.wk summary::-webkit-details-marker{display:none}
+  details.wk[open] summary{border-bottom:1px solid var(--line)}
+  details.wk .body{padding:6px 15px 12px}
+  .dayrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dotted var(--line);font-size:.88rem}
+  .dayrow:last-child{border:0}
+  .dayrow .d{width:42px;color:var(--gold);font-weight:700;flex-shrink:0}
+  .dayrow input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--gold)}
+  .cur{outline:2px solid var(--gold)}
+  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px}
+  .subtabs button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);padding:7px 12px;border-radius:9px;cursor:pointer;font-weight:600;font-size:.84rem}
+  .subtabs button.active{background:var(--gold);color:#1a1509;border-color:var(--gold)}
   .subview{display:none}.subview.active{display:block}
-  .row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
-  .foot{color:var(--muted);font-size:.8rem;text-align:center;margin:30px 0}
+  /* calendar */
+  .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-dow{text-align:center;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding-bottom:3px}
+  .cell{background:var(--panel2);border:1px solid var(--line);border-radius:10px;min-height:76px;padding:6px;cursor:pointer;font-size:.72rem;position:relative}
+  .cell:hover{border-color:var(--gold)}
+  .cell.empty{background:transparent;border:0;cursor:default}
+  .cell.today{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .cell .dn{font-weight:700;color:var(--text)}
+  .cell .dots{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .cell .rt{position:absolute;bottom:5px;right:6px;font-size:.64rem;color:var(--muted)}
+  .cell .ss{margin-top:3px;color:var(--teal);font-size:.66rem;line-height:1.25;overflow:hidden}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modal.open{display:flex}
+  .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:460px;width:100%;max-height:90vh;overflow:auto;padding:20px}
+  .chk{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dotted var(--line)}
+  .chk input{width:19px;height:19px;accent-color:var(--gold)}
+  .chk label{margin:0;text-transform:none;letter-spacing:0;font-size:.92rem;color:var(--text);font-weight:500}
+  .muted{color:var(--muted)}
+  .foot{color:var(--faint);font-size:.78rem;text-align:center;margin:34px 0 0}
+  .plan-att img{max-width:100%;border-radius:10px;border:1px solid var(--line);margin-top:8px}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <h1>Roddcoach · UT2 Engine Builder</h1>
-    <p>Bygg maskinen. Consistency over perfection. Mål: 2k på 6:40.</p>
-  </div>
-</header>
+<header><div class="wrap">
+  <h1>Roddcoach · Road to 6:40</h1>
+  <p>Bygg maskinen. Consistency over perfection. Skydda ryggen, respektera återhämtningen.</p>
+</div></header>
 
 <nav>
   <button class="active" data-tab="dash">Dashboard</button>
-  <button data-tab="calc">Pace-kalkylator</button>
-  <button data-tab="plans">Planer</button>
+  <button data-tab="cal">Kalender</button>
+  <button data-tab="plan">Uppföljning</button>
   <button data-tab="log">Logg</button>
-  <button data-tab="about">Om / Data</button>
+  <button data-tab="trend">Trender</button>
+  <button data-tab="plans">Planer</button>
 </nav>
 
 <main>
-<!-- ================= DASHBOARD ================= -->
+<!-- ============ DASHBOARD ============ -->
 <section id="dash" class="tab active">
-  <div class="card">
-    <h2>Min profil</h2>
-    <p class="sub">Sparas lokalt i din webbläsare. UT2-pace sätts från laktattest, inte uträknat.</p>
-    <div class="grid g4">
-      <div><label>Ålder</label><input id="pf-age" type="number"></div>
-      <div><label>Vikt-klass</label><select id="pf-weight"><option>Hwt</option><option>Lwt</option></select></div>
-      <div><label>2k-mål (m:ss)</label><input id="pf-goal" placeholder="6:40"></div>
-      <div><label>Nuvarande 2k-est. (m:ss)</label><input id="pf-cur" placeholder="7:24"></div>
-      <div><label>UT2-pace /500 (laktat)</label><input id="pf-ut2" placeholder="2:43"></div>
-      <div><label>UT2-laktat (mmol/L)</label><input id="pf-lac" placeholder="1,8"></div>
-      <div><label>Vilopuls (normal)</label><input id="pf-rhr" type="number" placeholder="52"></div>
-      <div><label>Drag factor</label><input id="pf-df" type="number" placeholder="118"></div>
-    </div>
-    <div class="row-actions"><button class="act" onclick="saveProfile()">Spara profil</button><span id="pf-saved" style="color:var(--green);font-size:.85rem"></span></div>
-  </div>
+  <div id="ot-banner"></div>
 
-  <div class="grid g3">
-    <div class="metric"><small>Mål-pace /500</small><div class="big" id="m-goal">1:40.0</div></div>
+  <div class="grid g4">
+    <div class="metric"><small>Mål-pace /500</small><div class="big" id="m-goal">—</div></div>
     <div class="metric"><small>Mål-watt</small><div class="big" id="m-watt">—</div></div>
     <div class="metric"><small>Kvar till mål /500</small><div class="big" id="m-gap">—</div></div>
+    <div class="metric"><small>Planvecka</small><div class="big" id="m-week">—</div></div>
   </div>
 
   <div class="card">
     <h2>Dagens readiness-check</h2>
-    <p class="sub">Svara innan passet. Appen avgör om du kör, drar ner eller vilar — byggd för att skydda en senior-kropp mot utbränning.</p>
+    <p class="sub">Svara innan passet. Appen avgör om du kör, drar ner eller vilar — och flaggar överansträngning.</p>
     <div class="grid g3">
       <div><label>Sömn i natt</label><select id="r-sleep"><option value="0">Bra (7h+)</option><option value="1">Okej</option><option value="2">Dålig</option></select></div>
       <div><label>Vilopuls i morse</label><select id="r-hr"><option value="0">Normal</option><option value="1">Lite förhöjd (+5–8)</option><option value="2">Klart förhöjd (+8)</option></select></div>
       <div><label>Träningsvärk</label><select id="r-sore"><option value="0">Ingen/lätt</option><option value="1">En del</option><option value="2">Mycket</option></select></div>
       <div><label>Energi / humör</label><select id="r-energy"><option value="0">Pigg</option><option value="1">Sådär</option><option value="2">Tom</option></select></div>
-      <div><label>Livsstress (jobb/barn)</label><select id="r-stress"><option value="0">Lugnt</option><option value="1">En del</option><option value="2">Hög belastning</option></select></div>
-      <div><label>Sjukdomstecken</label><select id="r-ill"><option value="0">Inga</option><option value="1">Ovanför halsen (snuva, lätt skav)</option><option value="3">Under halsen / feber / värk</option></select></div>
+      <div><label>Livsstress (jobb/barn)</label><select id="r-stress"><option value="0">Lugnt</option><option value="1">En del</option><option value="2">Hög</option></select></div>
+      <div><label>Sjukdomstecken</label><select id="r-ill"><option value="0">Inga</option><option value="1">Ovanför halsen</option><option value="3">Under halsen / feber</option></select></div>
     </div>
-    <div class="row-actions"><button class="act" onclick="readiness()">Bedöm dagen</button></div>
+    <div class="row-actions"><button class="act" onclick="doReadiness()">Bedöm dagen</button><span id="r-saved" class="muted" style="font-size:.84rem"></span></div>
     <div id="r-verdict"></div>
   </div>
-</section>
 
-<!-- ================= CALC ================= -->
-<section id="calc" class="tab">
   <div class="card">
-    <h2>Pace-kalkylator</h2>
-    <p class="sub">Mata in ett 2k-mål eller PB. Får ut tränings-pace (Pete Plan-relationer), 5k via Riegel, och watt per split.</p>
-    <div class="grid g3">
-      <div><label>2k-tid (m:ss)</label><input id="c-2k" value="6:40"></div>
-      <div><label>UT2-pace /500 (valfritt)</label><input id="c-ut2" placeholder="2:43"></div>
-      <div style="display:flex;align-items:end"><button class="act" style="width:100%" onclick="calc()">Räkna ut</button></div>
-    </div>
-    <div class="note">UT2 är aerob bas vid laktat under ~2 mmol/L och ska inte räknas från 2k — sätt det från laktattest. Lämnas fältet tomt uppskattas UT2 som 2k + 60 s som grov startpunkt.</div>
+    <h2>Återhämtning</h2>
+    <p class="sub">Hur många timmar ditt senaste pass kräver innan nästa kvalitetspass — tyngre pass och sämre readiness kostar mer.</p>
+    <div id="recov"></div>
   </div>
-  <div class="card" id="c-out" style="display:none">
-    <h2>Dina tränings-pace</h2>
-    <table>
-      <thead><tr><th>Pass</th><th>Typ</th><th>Mål /500</th><th>Watt</th><th>Grund</th></tr></thead>
-      <tbody id="c-rows"></tbody>
-    </table>
+
+  <div class="card">
+    <h2>Min profil</h2>
+    <p class="sub">Sparas i din webbläsare. UT2-pace sätts från laktattest, inte uträknat.</p>
+    <div class="grid g4">
+      <div><label>Ålder</label><input id="pf-age" type="number"></div>
+      <div><label>Viktklass</label><select id="pf-weight"><option>Hwt</option><option>Lwt</option></select></div>
+      <div><label>2k-mål (m:ss)</label><input id="pf-goal" placeholder="6:40"></div>
+      <div><label>Nuv. 2k-est. (m:ss)</label><input id="pf-cur" placeholder="7:20"></div>
+      <div><label>UT2-pace /500</label><input id="pf-ut2" placeholder="2:43"></div>
+      <div><label>UT2-laktat (mmol)</label><input id="pf-lac" placeholder="1,8"></div>
+      <div><label>Vilopuls</label><input id="pf-rhr" type="number" placeholder="52"></div>
+      <div><label>Planens startdatum (måndag v1)</label><input id="pf-start" type="date"></div>
+    </div>
+    <div class="row-actions"><button class="act" onclick="saveProfile()">Spara profil</button><span id="pf-saved" class="muted" style="font-size:.84rem"></span></div>
   </div>
 </section>
 
-<!-- ================= PLANS ================= -->
+<!-- ============ KALENDER ============ -->
+<section id="cal" class="tab">
+  <div class="card">
+    <h2>Mina dagliga rutiner</h2>
+    <p class="sub">Dina 5 egna punkter som bockas av varje dag. Redigera dem precis som du vill.</p>
+    <div class="grid g5" id="routine-edit"></div>
+    <div class="row-actions"><button class="act" onclick="saveRoutine()">Spara rutinpunkter</button><span id="rt-saved" class="muted" style="font-size:.84rem"></span></div>
+  </div>
+  <div class="card">
+    <div class="cal-head">
+      <button class="ghost tiny" onclick="calMove(-1)">‹ Förra</button>
+      <h2 id="cal-title" style="font-size:1.1rem"></h2>
+      <button class="ghost tiny" onclick="calMove(1)">Nästa ›</button>
+    </div>
+    <div class="cal-grid" id="cal-dow"></div>
+    <div class="cal-grid" id="cal-grid" style="margin-top:6px"></div>
+    <div class="note">Varje ruta visar: ● puls-färg (readiness) · träningsprick · rutin X/5. Klicka en dag för att bocka av rutiner, se readiness och dagens pass.</div>
+  </div>
+</section>
+
+<!-- ============ UPPFÖLJNING ============ -->
+<section id="plan" class="tab">
+  <div class="card">
+    <h2 id="plan-name">Uppföljning</h2>
+    <p class="sub">Din aktiva plan mappad mot kalendern. Nuvarande vecka är markerad. Bocka av varje genomfört pass.</p>
+    <div class="grid g3">
+      <div class="metric"><small>Nuvarande vecka</small><div class="big" id="pl-week">—</div></div>
+      <div class="metric"><small>Genomfört</small><div class="big" id="pl-done">—</div></div>
+      <div class="metric"><small>Startdatum</small><div class="big" id="pl-start" style="font-size:1.1rem">—</div></div>
+    </div>
+    <div class="note" id="pl-nostart" style="display:none">Sätt planens startdatum under <strong>Dashboard → Min profil</strong> för att få datum och "nuvarande vecka".</div>
+    <div id="plan-weeks" style="margin-top:14px"></div>
+  </div>
+</section>
+
+<!-- ============ LOGG ============ -->
+<section id="log" class="tab">
+  <div class="card">
+    <h2>Nytt pass (manuellt)</h2>
+    <p class="sub">Krossa varje pass: logga pace, laktat och hur det kändes. Fungerar helt utan Concept2-koppling.</p>
+    <div class="grid g4">
+      <div><label>Datum</label><input id="l-date" type="date"></div>
+      <div><label>Typ</label><select id="l-type">
+        <option>UT2</option><option>Lång UT2</option><option>AT</option><option>SPD/Hammer</option><option>Styrka (KB)</option><option>Test/2k</option><option>Vila/Övrigt</option></select></div>
+      <div><label>Beskrivning</label><input id="l-desc" placeholder="60min / 8x500 ..."></div>
+      <div><label>Distans (m)</label><input id="l-dist" type="number"></div>
+      <div><label>Snitt-pace /500</label><input id="l-pace" placeholder="2:43"></div>
+      <div><label>Spm</label><input id="l-spm" type="number"></div>
+      <div><label>Snittpuls</label><input id="l-hr" type="number"></div>
+      <div><label>Laktat (mmol)</label><input id="l-lac" placeholder="1,8"></div>
+      <div><label>RPE 1–10</label><input id="l-rpe" type="number" min="1" max="10"></div>
+      <div><label>Hur kändes det?</label><select id="l-feel">
+        <option value="">—</option><option>Lätt</option><option>Okej</option><option>Ansträngande</option><option>Tungt</option><option>Överansträngd</option></select></div>
+      <div style="grid-column:span 2"><label>Kommentar</label><input id="l-note" placeholder="känsla, teknik, omständigheter..."></div>
+    </div>
+    <div class="row-actions">
+      <button class="act" onclick="addLog()">Lägg till pass</button>
+      <button class="ghost" onclick="exportCSV()">Exportera CSV</button>
+      <label class="ghost" style="padding:10px 16px;border-radius:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;border:1px solid var(--gold);color:var(--gold)">
+        Importera CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
+      </label>
+    </div>
+    <div class="note">Ladda upp Concept2 Logbook-exporten direkt — appen känner igen formatet, hämtar datum, pace, spm, puls och laktat ur kommentarerna, gissar passtyp och hoppar över dubbletter.</div>
+  </div>
+  <div class="grid g4" id="log-stats"></div>
+  <div class="card">
+    <h2>Loggade pass</h2>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Datum</th><th>Typ</th><th>Beskr.</th><th>m</th><th>/500</th><th>spm</th><th>HR</th><th>Lac</th><th>RPE</th><th>Känsla</th><th></th></tr></thead>
+      <tbody id="log-rows"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ TRENDER ============ -->
+<section id="trend" class="tab">
+  <div class="card"><h2>UT2-pace över tid</h2><p class="sub">Din motor. Högre i grafen = snabbare (bättre). Endast UT2 & Lång UT2.</p><div id="t-ut2"></div></div>
+  <div class="card"><h2>Laktat över tid</h2><p class="sub">Lägre laktat vid samma pace = mer mitokondrier.</p><div id="t-lac"></div></div>
+  <div class="card"><h2>Veckovolym (meter)</h2><p class="sub">Senaste 12 veckorna. Volym bygger basen — men låt den stiga lugnt.</p><div id="t-vol"></div></div>
+  <div class="card"><h2>Snittpuls över tid</h2><p class="sub">Sjunkande puls på samma pace = förbättrad aerob ekonomi.</p><div id="t-hr"></div></div>
+</section>
+
+<!-- ============ PLANER ============ -->
 <section id="plans" class="tab">
   <div class="card">
-    <h2>Träningsplaner</h2>
-    <p class="sub">Fyra planer från din kunskapsbank. Backbone: mycket UT2-distans, ett fartpass + ett tröskelpass per vecka, alltid minst en vilodag.</p>
+    <h2>Importera egen plan</h2>
+    <p class="sub">CSV blir en spårbar tabell. Bild/PDF sparas som referens att titta på (hålls liten — webbläsarens lagring är begränsad).</p>
+    <div class="row-actions">
+      <div style="flex:1;min-width:180px"><label>Plannamn</label><input id="imp-name" placeholder="t.ex. Build-fas v1"></div>
+      <label class="ghost" style="padding:10px 16px;border-radius:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;border:1px solid var(--gold);color:var(--gold);align-self:end">
+        Välj fil (csv/bild/pdf)<input type="file" accept=".csv,image/*,.pdf" style="display:none" onchange="importPlan(this)">
+      </label>
+    </div>
+    <div id="my-plans" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <h2>Referensplaner</h2>
+    <p class="sub">Dina fyra inbyggda planer. Alltid här för inspiration.</p>
     <div class="subtabs">
       <button class="active" data-sub="pete">Pete Plan</button>
       <button data-sub="beg">24-v Beginner</button>
@@ -168,250 +282,355 @@
   </div>
 </section>
 
-<!-- ================= LOG ================= -->
-<section id="log" class="tab">
-  <div class="card">
-    <h2>Nytt pass</h2>
-    <div class="grid g4">
-      <div><label>Datum</label><input id="l-date" type="date"></div>
-      <div><label>Typ</label><select id="l-type"><option>UT2</option><option>AT</option><option>SPD</option><option>Test/2k</option><option>Vila/Övrigt</option></select></div>
-      <div><label>Beskrivning</label><input id="l-desc" placeholder="60min / 8x500 ..."></div>
-      <div><label>Distans (m)</label><input id="l-dist" type="number"></div>
-      <div><label>Snitt-pace /500</label><input id="l-pace" placeholder="2:43"></div>
-      <div><label>Spm</label><input id="l-spm" type="number"></div>
-      <div><label>Snittpuls</label><input id="l-hr" type="number"></div>
-      <div><label>Laktat (mmol)</label><input id="l-lac" placeholder="1,8"></div>
-      <div><label>RPE 1–10</label><input id="l-rpe" type="number" min="1" max="10"></div>
-      <div style="grid-column:span 3"><label>Kommentar</label><input id="l-note"></div>
-    </div>
-    <div class="row-actions">
-      <button class="act" onclick="addLog()">Lägg till pass</button>
-      <button class="ghost" onclick="exportCSV()">Exportera CSV</button>
-      <label class="ghost" style="padding:10px 16px;border-radius:9px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;border:1px solid var(--teal);color:var(--teal);width:auto">
-        Importera CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
-      </label>
-    </div>
-  </div>
-  <div class="grid g4" id="log-stats"></div>
-  <div class="card">
-    <h2>Loggade pass</h2>
-    <div style="overflow-x:auto"><table>
-      <thead><tr><th>Datum</th><th>Typ</th><th>Beskrivning</th><th>m</th><th>/500</th><th>spm</th><th>HR</th><th>Lac</th><th>RPE</th><th></th></tr></thead>
-      <tbody id="log-rows"></tbody>
-    </table></div>
-  </div>
-</section>
-
-<!-- ================= ABOUT ================= -->
-<section id="about" class="tab">
-  <div class="card">
-    <h2>Om appen</h2>
-    <p class="sub">En självständig coachningsapp för inomhusrodd — allt i en fil.</p>
-    <p style="font-size:.92rem">Byggd kring principerna i dina planer: bygg den aeroba motorn med stor volym UT2 vid laktatkalibrerad pace, lägg ovanpå ett fart- och ett tröskelpass per vecka, och respektera återhämtning. Readiness-checken följer "ovanför halsen"-regeln och väger in sömn, vilopuls, värk, energi och livsstress — extra viktigt för en vuxen atlet med jobb, barn och en kropp på 40+.</p>
-    <h3 style="margin-top:16px;font-size:1.05rem">Lägg på GitHub</h3>
-    <ol style="font-size:.9rem;color:var(--muted)">
-      <li>Skapa ett repo, lägg denna fil som <strong>index.html</strong>.</li>
-      <li>Settings → Pages → Branch: main → <strong>/ (root)</strong> → Save.</li>
-      <li>Appen ligger live på <code>https://&lt;användarnamn&gt;.github.io/&lt;repo&gt;/</code></li>
-    </ol>
-    <div class="note">All data sparas bara i din webbläsare (localStorage). Byter du enhet: exportera CSV och importera på nytt. Ingenting skickas någonstans.</div>
-    <div class="row-actions"><button class="ghost" onclick="if(confirm('Rensa ALL lokal data?')){localStorage.clear();location.reload()}">Rensa all data</button></div>
-  </div>
-</section>
-
-<p class="foot">Roddcoach · byggd för att bygga maskinen, inte bränna ut den.</p>
+<p class="foot">Roddcoach · byggd för att bygga maskinen, inte bränna ut den. All data lever i din webbläsare.</p>
 </main>
 
-<script>
-/* ---------- helpers ---------- */
-const $ = id => document.getElementById(id);
-function p2s(str){ if(!str) return null; str=(''+str).replace(',','.').trim();
-  const m=str.match(/^(\d+):(\d+(?:\.\d+)?)$/); if(m) return +m[1]*60+ +m[2];
-  const f=parseFloat(str); return isNaN(f)?null:f; }
-function s2p(sec){ if(sec==null||isNaN(sec)) return '—'; const m=Math.floor(sec/60);
-  const s=(sec-m*60).toFixed(1); return m+':'+(s<10?'0':'')+s; }
-function watts(split500){ if(!split500) return '—'; const pace=split500/500;
-  return Math.round(2.80/Math.pow(pace,3)); }
+<!-- day modal -->
+<div class="modal" id="daymodal"><div class="box" id="daybox"></div></div>
 
-/* ---------- tabs ---------- */
+<script>
+/* ===== helpers ===== */
+const $=id=>document.getElementById(id);
+const DOW=['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
+const MON=['Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'];
+function p2s(str){if(!str)return null;str=(''+str).replace(',','.').trim();const m=str.match(/^(\d+):(\d+(?:\.\d+)?)$/);if(m)return +m[1]*60+ +m[2];const f=parseFloat(str);return isNaN(f)?null:f;}
+function s2p(s){if(s==null||isNaN(s))return'—';const m=Math.floor(s/60),x=(s-m*60).toFixed(1);return m+':'+(x<10?'0':'')+x;}
+function watts(sp){if(!sp)return'—';return Math.round(2.80/Math.pow(sp/500,3));}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function dstr(d){return d.toISOString().slice(0,10);}
+function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return dstr(d);}
+function mondayOf(s){const d=new Date(s+'T00:00:00');const o=(d.getDay()+6)%7;d.setDate(d.getDate()-o);return dstr(d);}
+function get(k,def){try{return JSON.parse(localStorage.getItem(k))??def}catch(e){return def}}
+function set(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+/* ===== tabs ===== */
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active'); $(b.dataset.tab).classList.add('active');
+  b.classList.add('active');$(b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='trend')renderTrends();
+  if(b.dataset.tab==='cal')renderCal();
+  if(b.dataset.tab==='plan')renderPlan();
 });
 document.querySelectorAll('.subtabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.subtabs button').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.subview').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active'); $(b.dataset.sub).classList.add('active');
+  b.classList.add('active');$(b.dataset.sub).classList.add('active');
 });
 
-/* ---------- profile ---------- */
-const PF='rc_profile';
+/* ===== profile ===== */
 function saveProfile(){
-  const p={age:$('pf-age').value,weight:$('pf-weight').value,goal:$('pf-goal').value,
-    cur:$('pf-cur').value,ut2:$('pf-ut2').value,lac:$('pf-lac').value,
-    rhr:$('pf-rhr').value,df:$('pf-df').value};
-  localStorage.setItem(PF,JSON.stringify(p));
-  $('pf-saved').textContent='✓ sparat'; setTimeout(()=>$('pf-saved').textContent='',2000);
-  renderDash();
+  set('rc_profile',{age:$('pf-age').value,weight:$('pf-weight').value,goal:$('pf-goal').value,
+    cur:$('pf-cur').value,ut2:$('pf-ut2').value,lac:$('pf-lac').value,rhr:$('pf-rhr').value,start:$('pf-start').value});
+  $('pf-saved').textContent='✓ sparat';setTimeout(()=>$('pf-saved').textContent='',2000);
+  renderDash();renderPlan();
 }
 function loadProfile(){
-  const p=JSON.parse(localStorage.getItem(PF)||'{}');
-  $('pf-age').value=p.age||44; $('pf-weight').value=p.weight||'Hwt';
-  $('pf-goal').value=p.goal||'6:40'; $('pf-cur').value=p.cur||'';
-  $('pf-ut2').value=p.ut2||'2:43'; $('pf-lac').value=p.lac||'1,8';
-  $('pf-rhr').value=p.rhr||''; $('pf-df').value=p.df||'118';
+  const p=get('rc_profile',{});
+  $('pf-age').value=p.age||44;$('pf-weight').value=p.weight||'Hwt';$('pf-goal').value=p.goal||'6:40';
+  $('pf-cur').value=p.cur||'';$('pf-ut2').value=p.ut2||'2:43';$('pf-lac').value=p.lac||'1,8';
+  $('pf-rhr').value=p.rhr||'';$('pf-start').value=p.start||'';
   return p;
 }
 function renderDash(){
-  const p=JSON.parse(localStorage.getItem(PF)||'{}');
-  const goal=p2s(p.goal||'6:40'); const gs=goal/4;
-  $('m-goal').textContent=s2p(gs);
-  $('m-watt').textContent=watts(gs);
-  const cur=p2s(p.cur); 
-  $('m-gap').textContent=cur?('-'+(cur/4-gs).toFixed(1)+'s'):'sätt 2k-est.';
+  const p=get('rc_profile',{});const goal=p2s(p.goal||'6:40'),gs=goal/4;
+  $('m-goal').textContent=s2p(gs);$('m-watt').textContent=watts(gs)+' W';
+  const cur=p2s(p.cur);$('m-gap').textContent=cur?('-'+(cur/4-gs).toFixed(1)+'s'):'sätt est.';
+  $('m-week').textContent=p.start?('v'+planWeek(p.start)):'—';
+  renderRecovery();renderOvertrain();
 }
 
-/* ---------- readiness ---------- */
-function readiness(){
-  const ill=+$('r-ill').value;
-  const score=+$('r-sleep').value+ +$('r-hr').value+ +$('r-sore').value+
-    +$('r-energy').value+ +$('r-stress').value+ill;
-  const el=$('r-verdict'); let cls,txt;
-  if(ill>=3){ cls='v-red'; txt='🛑 VILA. Symtom under halsen eller feber — ingen hård träning. Låt immunförsvaret jobba, sov, drick. Tre vilodagar gör inget med din aeroba bas.'; }
-  else if(score>=7){ cls='v-red'; txt='🛑 VILA eller bara lätt rörlighet. Kroppen signalerar överbelastning. Att pressa idag kostar mer än det ger.'; }
-  else if(score>=4||ill===1){ cls='v-amber'; txt='🟡 DRA NER. Kör UT2 lugnt (puls under tröskel, aldrig hårdare än din UT2-pace), korta ner volymen, hoppa intervallerna. '+(ill===1?'Skav i halsen = max lätt UT2.':'Lyssna på kroppen under passet.'); }
-  else{ cls='v-green'; txt='🟢 KÖR PÅ. Grönt läge — genomför dagens planerade pass. Håll målpace, spara sista repet.'; }
-  el.className='verdict '+cls; el.textContent=txt;
+/* ===== readiness ===== */
+function readinessVerdict(v){ // v: {sleep,hr,sore,energy,stress,ill}
+  const sc=v.sleep+v.hr+v.sore+v.energy+v.stress+v.ill;
+  let cls,txt,key;
+  if(v.ill>=3){cls='v-red';key='red';txt='🛑 VILA. Symtom under halsen eller feber — ingen hård träning. Sömn, vätska, låt kroppen jobba. Tre vilodagar gör inget med din aeroba bas.';}
+  else if(sc>=7){cls='v-red';key='red';txt='🛑 VILA eller bara lätt rörlighet. Kroppen signalerar överbelastning. Att pressa idag kostar mer än det ger.';}
+  else if(sc>=4||v.ill===1){cls='v-amber';key='amber';txt='🟡 DRA NER. Kör lugn UT2, aldrig hårdare än UT2-pace, korta volymen, hoppa intervaller. '+(v.ill===1?'Skav i halsen = max lätt UT2.':'Lyssna på kroppen.');}
+  else{cls='v-green';key='green';txt='🟢 KÖR PÅ. Grönt läge — genomför dagens planerade pass. Håll målpace, spara sista repet.';}
+  return {sc,cls,txt,key};
+}
+function doReadiness(){
+  const v={sleep:+$('r-sleep').value,hr:+$('r-hr').value,sore:+$('r-sore').value,
+    energy:+$('r-energy').value,stress:+$('r-stress').value,ill:+$('r-ill').value};
+  const r=readinessVerdict(v);
+  const days=get('rc_days',{});const t=todayStr();
+  days[t]=days[t]||{};days[t].readiness={...v,verdict:r.key,sc:r.sc};set('rc_days',days);
+  const el=$('r-verdict');el.className='verdict '+r.cls;el.textContent=r.txt;
+  $('r-saved').textContent='✓ sparat';setTimeout(()=>$('r-saved').textContent='',2000);
+  renderOvertrain();renderCal();
+}
+function renderOvertrain(){
+  const days=get('rc_days',{}),logs=get('rc_log',[]),t=todayStr();
+  // collect overexertion signals by date
+  const sig={};
+  Object.entries(days).forEach(([d,o])=>{if(o.readiness&&o.readiness.verdict==='red')sig[d]=true;});
+  logs.forEach(e=>{if(e.feel==='Överansträngd'||(+e.rpe)>=9)sig[e.date]=true;});
+  const dates=Object.keys(sig).filter(d=>d<=t).sort();
+  const last=dates[dates.length-1];
+  const el=$('ot-banner');el.innerHTML='';
+  if(!last)return;
+  const checkedToday=days[t]&&days[t].readiness;
+  if(last===t){
+    el.innerHTML='<div class="alert">⚠️ Du har flaggat överansträngning idag. Utmaning: vila eller mycket lätt rörlighet. En dag för lite träning slår aldrig en vecka borta.</div>';
+  }else if(!checkedToday){
+    const dd=new Date(last+'T00:00:00');
+    el.innerHTML='<div class="alert">⚠️ Du flaggade överansträngning '+DOW[(dd.getDay()+6)%7]+' '+last+'. Hur mår du idag? Gör en ny readiness-check innan du tränar — och välj hellre vila/lätt om du är det minsta kvar i gropen.</div>';
+  }
 }
 
-/* ---------- calculator ---------- */
-function calc(){
-  const t2=p2s($('c-2k').value); if(!t2){alert('Ange 2k som m:ss');return;}
-  const p2k=t2/4;
-  const t5=t2*Math.pow(2.5,1.06); const p5=t5/10;      // Riegel 2k->5k
-  let ut2=p2s($('c-ut2').value); if(!ut2) ut2=p2k+60;
-  const rows=[
-    ['UT2 distans','p-ut2',ut2,'laktat/2k+60'],
-    ['8×500m','p-spd',p2k-3,'2k − 3s'],
-    ['Pyramid 250–1k','p-spd',p2k,'2k-pace'],
-    ['4×1000m','p-spd',p2k+1,'2k + 1s'],
-    ['5×1500m','p-at',p5,'5k-pace'],
-    ['4×2000m','p-at',p5+0.5,'5k + 0.5s'],
-    ['3k/2.5k/2k','p-at',p5+1,'5k + 1s'],
-  ];
-  $('c-rows').innerHTML=rows.map(r=>{
-    const lbl=r[1]==='p-ut2'?'UT2':r[1]==='p-at'?'AT':'SPD';
-    return `<tr><td>${r[0]}</td><td><span class="pill ${r[1]}">${lbl}</span></td>
-      <td><strong>${s2p(r[2])}</strong></td><td>${watts(r[2])} W</td><td style="color:var(--muted)">${r[3]}</td></tr>`;
+/* ===== recovery ===== */
+const RECOV={'UT2':10,'Lång UT2':18,'AT':34,'SPD/Hammer':44,'Styrka (KB)':24,'Test/2k':60,'Vila/Övrigt':2};
+function recoveryHours(e){
+  let h=RECOV[e.type]??16;
+  if(e.rpe)h*=(0.55+(+e.rpe)/11);
+  else if(e.feel){const f={'Lätt':0.7,'Okej':0.9,'Ansträngande':1.1,'Tungt':1.3,'Överansträngd':1.6}[e.feel];if(f)h*=f;}
+  return Math.round(h);
+}
+function renderRecovery(){
+  const logs=get('rc_log',[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const el=$('recov');
+  if(!logs.length){el.innerHTML='<p class="muted">Inga pass loggade än.</p>';return;}
+  const last=logs[0];const h=recoveryHours(last);
+  const end=new Date(last.date+'T12:00:00');end.setHours(end.getHours()+h);
+  const now=new Date();const left=Math.max(0,Math.round((end-now)/36e5));
+  const rec=now>=end;
+  const p=get('rc_profile',{});
+  let nextTxt='';
+  if(p.start){const nx=nextPlanSession();if(nx)nextTxt=`<div class="metric"><small>Nästa planerade pass</small><div style="font-size:1rem;color:var(--text);margin-top:4px"><strong>${nx.date}</strong> · ${nx.label}<br><span class="pill ${typeCls(nx.type)}">${nx.type}</span></div></div>`;}
+  el.innerHTML=`<div class="grid g3">
+    <div class="metric"><small>Senaste pass</small><div style="font-size:1rem;color:var(--text);margin-top:4px">${last.desc||last.type}<br><span class="pill ${typeCls(last.type)}">${last.type}</span></div></div>
+    <div class="metric"><small>Kräver återhämtning</small><div class="big">${h} h</div></div>
+    <div class="metric"><small>Status</small><div style="margin-top:6px;font-weight:700;color:${rec?'var(--green)':'var(--amber)'}">${rec?'✓ Återhämtad':('~'+left+' h kvar')}</div></div>
+    ${nextTxt}</div>
+    ${!rec?'<div class="note">Du är inte fullt återhämtad än. Är nästa pass ett kvalitetspass (AT/SPD/Test) — överväg att skjuta eller byta till lugn UT2.</div>':''}`;
+}
+function typeCls(t){return {'UT2':'p-ut2','Lång UT2':'p-lut2','AT':'p-at','SPD/Hammer':'p-spd','Styrka (KB)':'p-str','Test/2k':'p-tt'}[t]||'';}
+
+/* ===== PLAN (Road to 6:40 Base) ===== */
+const MON_S='60 min UT2 (row/bike) · HR <141', FRI_S=MON_S, SUN_S='Tung KB + mobilitet/core';
+const THU=['8×500m · 1:55–2:00 · r28–30 · vila 3m','4×1000m · 2:05–2:10 · r24–26 · vila 5m','3×2000m · 2:15–2:20 · r22–24 · vila 6m','4×500m (DELOAD) · moderat · r24 · vila 4m'];
+const SATMIN=[90,100,110,60,110,120,130,70,120,130,140,80];
+const PLAN={name:'Road to 6:40 — Base (12 veckor)',weeks:[]};
+for(let i=0;i<12;i++){const dl=(i+1)%4===0;PLAN.weeks.push({w:i+1,deload:dl,
+  days:[['Mån','UT2',MON_S],['Tor',dl?'SPD/Hammer':(i%4<3?['SPD/Hammer','SPD/Hammer','AT'][i%4]:'SPD/Hammer'),THU[i%4]],
+    ['Fre','UT2',FRI_S],['Lör','Lång UT2',SATMIN[i]+' min UT2 (mixed) · HR <141'+(dl?' (deload)':'')],['Sön','Styrka (KB)',SUN_S]]});}
+const PLANDAYOFF={'Mån':0,'Tor':3,'Fre':4,'Lör':5,'Sön':6};
+function planWeek(start){const diff=Math.floor((new Date(todayStr())-new Date(start))/(7*864e5));return Math.min(12,Math.max(1,diff+1));}
+function nextPlanSession(){
+  const p=get('rc_profile',{});if(!p.start)return null;const t=todayStr();
+  for(let w=0;w<12;w++)for(const d of PLAN.weeks[w].days){
+    const date=addDays(p.start,w*7+PLANDAYOFF[d[0]]);
+    if(date>=t)return{date,type:d[1],label:d[2]};
+  }return null;
+}
+function renderPlan(){
+  const p=get('rc_profile',{});$('plan-name').textContent=PLAN.name;
+  const prog=get('rc_planprog',{});
+  const done=Object.values(prog).filter(Boolean).length;
+  $('pl-done').textContent=done+'/60';
+  if(p.start){$('pl-week').textContent='v'+planWeek(p.start);$('pl-start').textContent=p.start;$('pl-nostart').style.display='none';}
+  else{$('pl-week').textContent='—';$('pl-start').textContent='—';$('pl-nostart').style.display='block';}
+  const cw=p.start?planWeek(p.start):0;
+  $('plan-weeks').innerHTML=PLAN.weeks.map(wk=>{
+    const open=wk.w===cw?' open':'';const curcls=wk.w===cw?' cur':'';
+    const rows=wk.days.map(d=>{
+      const key='w'+wk.w+'-'+d[0];const date=p.start?addDays(p.start,(wk.w-1)*7+PLANDAYOFF[d[0]]):'';
+      return `<div class="dayrow"><input type="checkbox" ${prog[key]?'checked':''} onchange="togglePlan('${key}')">
+        <span class="d">${d[0]}</span><span class="pill ${typeCls(d[1])}">${d[1]}</span>
+        <span>${d[2]}</span>${date?`<span class="muted" style="margin-left:auto;font-size:.76rem">${date}</span>`:''}</div>`;
+    }).join('');
+    const dn=wk.days.filter(d=>prog['w'+wk.w+'-'+d[0]]).length;
+    return `<details class="wk${curcls}"${open}><summary><span>Vecka ${wk.w}${wk.deload?' · DELOAD':''}</span><span class="muted" style="font-size:.8rem">${dn}/5</span></summary><div class="body">${rows}</div></details>`;
   }).join('');
-  $('c-out').style.display='block';
 }
+function togglePlan(k){const p=get('rc_planprog',{});p[k]=!p[k];set('rc_planprog',p);renderPlan();}
 
-/* ---------- plans data ---------- */
-const PETE=`<p style="font-size:.92rem;color:var(--muted)">Kontinuerlig plan i 3-veckorscykel. 1 fartpass + 1 tröskelpass + resten UT2-distans (22–25 spm), 1 vilodag. Matcha förra passets snitt, kör sista repet all-out.</p>`+
-[['Vecka 1','8×500m / 3:30 vila','5×1500m / 5:00 vila'],
- ['Vecka 2','Pyramid 250-500-750-1k-750-500-250','4×2000m / 5:00 vila'],
- ['Vecka 3','4×1000m / 5:00 vila','3k / 2.5k / 2k · 5:00 vila']]
- .map(w=>`<details class="wk"><summary>${w[0]}</summary><div class="body">
-   <div><span class="pill p-spd">SPD</span> ${w[1]}</div>
-   <div><span class="pill p-at">AT</span> ${w[2]}</div>
-   <div>+ 3–4× UT2-distans (~8–15k) och ett hårt distanspass · 1 vilodag</div></div></details>`).join('');
-
-const BEG=`<p style="font-size:.92rem;color:var(--muted)">Din skräddarsydda 24-v plan. UT2 låst 2:43 (≈1,8 mmol). Volym 8K→12K. AT 2:16→2:08, SPD 1:57→1:51.</p>`+
-[[1,'🔵 8000m','🔴 6×500m 1:57'],[4,'🔵 9000m','🔴 3×1000m 1:57'],[7,'🔵 10000m','🔴 7×500m 1:56'],
- [10,'🔵 11000m','🟡 3×2000m 2:14'],[12,'🔵 11000m','🟡 4×1500m 2:14'],[16,'🔵 12000m','🟡 5×1500m 2:12'],
- [20,'🔵 12000m','🟡 5×1500m 2:10'],[24,'🔵 12000m','🟡 5×1500m 2:08']]
- .map(w=>`<details class="wk"><summary>Vecka ${w[0]}</summary><div class="body">
-   <div>D1 UT2-distans: ${w[1]} @ 2:43 · 22r</div>
-   <div>D2 Huvudintervall: ${w[2]}</div>
-   <div>D3 UT2 8000m @ 2:43 + valfria pass</div></div></details>`).join('')+
- `<div class="note">Efter v24: 8×500 på 1:51 = nytt 2k-riktmärke. Testa 2k efter 2 vilodagar.</div>`;
-
-const DAD=`<p style="font-size:.92rem;color:var(--muted)">12 veckor, 30–45 min/pass. 30-min power/tempo + fartintervaller + volym + drag sprints. Kräver aktuellt 2k.</p>`+
-[[1,'30min @20spm (2k+16)','6×500 / 3min (2k −1/−2)','8000m @18spm (2k+19/20)','Drag: 4×(3×1:00) r24'],
- [3,'30min @22spm (2k+14)','10×250 / 3min','8000m @20spm (2k+17/18)','Drag r28 · + 1000m 2k-prep'],
- [6,'30min @18spm','10×250 / 2min','3×2000 r24/26/28','+ 1250m 2k-prep'],
- [9,'30min @20spm','10×250 / 1min','10k @18spm','+ 1500m 2k-prep'],
- [12,'30min @18spm','500/500/1250 @2k','3×3000 r20','🏁 2000m TIME TRIAL']]
- .map(w=>`<details class="wk"><summary>Vecka ${w[0]}</summary><div class="body">
-   <div><span class="pill p-at">Power/Tempo</span> ${w[1]}</div>
-   <div><span class="pill p-spd">Fart</span> ${w[2]}</div>
-   <div><span class="pill p-ut2">Volym</span> ${w[3]}</div>
-   <div>${w[4]}</div></div></details>`).join('');
-
-const RACE=`<p style="font-size:.92rem;color:var(--muted)">Race Series 2000m TT-prep (rodd + ski). 6 pass/vecka-meny över 12 veckor, byggd kring ditt 2k-pace. Välj det du hinner.</p>`+
-`<details class="wk" open><summary>Passtyper varje vecka</summary><div class="body">
-  <div><span class="pill p-at">1</span> 30 min single @ 18–22 spm (power/tempo)</div>
-  <div><span class="pill p-spd">2</span> Fartintervall (1250/1000/750/500/250m, open rate)</div>
-  <div><span class="pill p-at">3</span> Distansintervall 2000–2500m, stegrad rate</div>
-  <div><span class="pill p-spd">4</span> Korta fartrep / variabel rate</div>
-  <div><span class="pill p-ut2">5</span> Drag sprints (1min/40s/30s, +20–30 DF)</div>
-  <div><span class="pill p-spd">6</span> Checkpoint / variabla rate-pass</div>
-  <div>Vecka 12 avslutas med 2000m TT.</div></div></details>
-  <div class="note">Pacing-tips: antingen starta snabbt och håll ut, eller starta konservativt och bygg fart. Allt paceat mot 2k-målet.</div>`;
-$('pete').innerHTML=PETE; $('beg').innerHTML=BEG; $('dad').innerHTML=DAD; $('race').innerHTML=RACE;
-
-/* ---------- log ---------- */
-const LG='rc_log';
-function getLog(){return JSON.parse(localStorage.getItem(LG)||'[]');}
-function setLog(a){localStorage.setItem(LG,JSON.stringify(a));renderLog();}
+/* ===== LOG ===== */
 function addLog(){
-  const e={date:$('l-date').value||new Date().toISOString().slice(0,10),
-    type:$('l-type').value,desc:$('l-desc').value,dist:$('l-dist').value,
-    pace:$('l-pace').value,spm:$('l-spm').value,hr:$('l-hr').value,
-    lac:$('l-lac').value,rpe:$('l-rpe').value,note:$('l-note').value};
-  const a=getLog(); a.push(e); setLog(a);
-  ['l-desc','l-dist','l-pace','l-spm','l-hr','l-lac','l-rpe','l-note'].forEach(i=>$(i).value='');
+  const e={date:$('l-date').value||todayStr(),type:$('l-type').value,desc:$('l-desc').value,
+    dist:$('l-dist').value,pace:$('l-pace').value,spm:$('l-spm').value,hr:$('l-hr').value,
+    lac:$('l-lac').value,rpe:$('l-rpe').value,feel:$('l-feel').value,note:$('l-note').value};
+  const a=get('rc_log',[]);a.push(e);set('rc_log',a);
+  ['l-desc','l-dist','l-pace','l-spm','l-hr','l-lac','l-rpe','l-note'].forEach(i=>$(i).value='');$('l-feel').value='';
+  renderLog();renderDash();
 }
-function delLog(i){const a=getLog();a.splice(i,1);setLog(a);}
+function delLog(i){const a=get('rc_log',[]);a.splice(i,1);set('rc_log',a);renderLog();renderDash();}
 function renderLog(){
-  const a=getLog().slice().sort((x,y)=>y.date.localeCompare(x.date));
-  $('log-rows').innerHTML=a.map((e,idx)=>{
-    const real=getLog().indexOf(e);
-    const cls=e.type==='UT2'?'p-ut2':e.type==='AT'?'p-at':e.type==='SPD'?'p-spd':'';
-    return `<tr><td>${e.date}</td><td>${cls?`<span class="pill ${cls}">${e.type}</span>`:e.type}</td>
-      <td>${e.desc||''}</td><td>${e.dist||''}</td><td>${e.pace||''}</td><td>${e.spm||''}</td>
-      <td>${e.hr||''}</td><td>${e.lac||''}</td><td>${e.rpe||''}</td>
-      <td><button class="act tiny ghost" onclick="delLog(${real})">✕</button></td></tr>`;
-  }).join('')||'<tr><td colspan="10" style="color:var(--muted)">Inga pass ännu.</td></tr>';
-  // stats last 28 days
-  const cut=new Date(Date.now()-28*864e5).toISOString().slice(0,10);
-  const r=getLog().filter(e=>e.date>=cut);
+  const a=get('rc_log',[]);const sorted=a.map((e,i)=>({e,i})).sort((x,y)=>y.e.date.localeCompare(x.e.date));
+  $('log-rows').innerHTML=sorted.map(({e,i})=>`<tr>
+    <td>${e.date}</td><td><span class="pill ${typeCls(e.type)}">${e.type}</span></td><td>${e.desc||''}</td>
+    <td>${e.dist||''}</td><td>${e.pace||''}</td><td>${e.spm||''}</td><td>${e.hr||''}</td>
+    <td>${e.lac||''}</td><td>${e.rpe||''}</td><td>${e.feel||''}</td>
+    <td><button class="act tiny ghost" onclick="delLog(${i})">✕</button></td></tr>`).join('')
+    ||'<tr><td colspan="11" class="muted">Inga pass ännu.</td></tr>';
+  const cut=addDays(todayStr(),-28);const r=a.filter(e=>e.date>=cut);
   const tot=r.reduce((s,e)=>s+(+e.dist||0),0);
-  const ut2m=r.filter(e=>e.type==='UT2').reduce((s,e)=>s+(+e.dist||0),0);
-  const sess=r.length;
-  const avgRpe=r.filter(e=>e.rpe).reduce((s,e,_,ar)=>s+(+e.rpe)/ar.length,0);
+  const ut2=r.filter(e=>e.type==='UT2'||e.type==='Lång UT2').reduce((s,e)=>s+(+e.dist||0),0);
+  const rp=r.filter(e=>e.rpe);const avg=rp.length?rp.reduce((s,e)=>s+(+e.rpe),0)/rp.length:0;
   $('log-stats').innerHTML=`
-    <div class="metric"><small>Pass / 28 dgr</small><div class="big">${sess}</div></div>
-    <div class="metric"><small>Total meter / 28 dgr</small><div class="big">${(tot/1000).toFixed(1)}k</div></div>
-    <div class="metric"><small>UT2-andel</small><div class="big">${tot?Math.round(ut2m/tot*100):0}%</div></div>
-    <div class="metric"><small>Snitt-RPE</small><div class="big">${avgRpe?avgRpe.toFixed(1):'—'}</div></div>`;
+    <div class="metric"><small>Pass / 28 dgr</small><div class="big">${r.length}</div></div>
+    <div class="metric"><small>Meter / 28 dgr</small><div class="big">${(tot/1000).toFixed(1)}k</div></div>
+    <div class="metric"><small>UT2-andel</small><div class="big">${tot?Math.round(ut2/tot*100):0}%</div></div>
+    <div class="metric"><small>Snitt-RPE</small><div class="big">${avg?avg.toFixed(1):'—'}</div></div>`;
 }
-function exportCSV(){
-  const a=getLog(); const h=['date','type','desc','dist','pace','spm','hr','lac','rpe','note'];
+function parseCSV(text){const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}
+    else if(c==='"')q=true;else if(c===','){row.push(cur);cur='';}
+    else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';}else if(c!=='\r')cur+=c;}
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}return rows.filter(r=>r.some(c=>c.trim()!==''));}
+function guessType(desc,secs,dist){
+  const m=(desc||'').match(/(\d+)\s*[x×]\s*(\d+)/i);
+  if(m)return(+m[2])<=1000?'SPD/Hammer':'AT';
+  if(/time trial|\btt\b|\b2k\b/i.test(desc||''))return'Test/2k';
+  if((+secs)>4500||(+dist)>=12000)return'Lång UT2';return'UT2';}
+function importCSV(inp){const f=inp.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=ev=>{const rows=parseCSV(ev.target.result);if(!rows.length){alert('Tom fil.');return;}
+    const H=rows.shift().map(s=>s.replace(/"/g,'').trim());const idx=n=>H.findIndex(h=>h.toLowerCase()===n.toLowerCase());
+    const c2=idx('Work Distance')>-1||idx('Stroke Rate/Cadence')>-1;const a=get('rc_log',[]);
+    const exists=o=>a.some(e=>e.date===o.date&&(e.desc||'')===(o.desc||'')&&(''+(e.dist||''))===(''+(o.dist||''))&&(e.pace||'')===(o.pace||''));
+    let add=0,skip=0;
+    rows.forEach(c=>{let o;
+      if(c2){const g=n=>{const i=idx(n);return i>-1?(c[i]||'').trim():'';};const date=(g('Date')||'').slice(0,10);if(!date)return;
+        const com=g('Comments'),lm=com.match(/([\d.,]+)\s*mmol/i);
+        o={date,type:guessType(g('Description'),g('Work Time (Seconds)'),g('Work Distance')),desc:g('Description'),
+          dist:g('Work Distance'),pace:g('Pace'),spm:g('Stroke Rate/Cadence').replace(/\.0$/,''),
+          hr:g('Avg Heart Rate').replace(/\.0$/,''),lac:lm?lm[1]:'',rpe:'',feel:'',note:com};
+      }else{const k=['date','type','desc','dist','pace','spm','hr','lac','rpe','feel','note'];o={};k.forEach((kk,i)=>o[kk]=(c[i]||'').trim());if(!o.date)return;}
+      if(exists(o)){skip++;return;}a.push(o);add++;});
+    set('rc_log',a);renderLog();renderDash();
+    alert('Import klar — '+add+' nya pass, '+skip+' dubbletter hoppade över.\nFormat: '+(c2?'Concept2 Logbook':'appens eget'));};
+  rd.readAsText(f);}
+function exportCSV(){const a=get('rc_log',[]);const h=['date','type','desc','dist','pace','spm','hr','lac','rpe','feel','note'];
   const csv=[h.join(',')].concat(a.map(e=>h.map(k=>`"${(e[k]||'').toString().replace(/"/g,'""')}"`).join(','))).join('\n');
-  const b=new Blob([csv],{type:'text/csv'}); const u=URL.createObjectURL(b);
-  const link=document.createElement('a'); link.href=u; link.download='roddlogg.csv'; link.click();
+  const b=new Blob([csv],{type:'text/csv'}),u=URL.createObjectURL(b),l=document.createElement('a');
+  l.href=u;l.download='roddlogg.csv';l.click();}
+
+/* ===== ROUTINE + CALENDAR ===== */
+const DEFROUTINE=['Sömn 7h+','Mobilitet/core (rygg)','Protein i varje mål','Vätska 2–3 L','Morgonpuls/vikt'];
+function loadRoutine(){const r=get('rc_routine',DEFROUTINE);
+  $('routine-edit').innerHTML=r.map((x,i)=>`<div><label>Punkt ${i+1}</label><input id="rt-${i}" value="${(x||'').replace(/"/g,'&quot;')}"></div>`).join('');}
+function saveRoutine(){const r=[0,1,2,3,4].map(i=>$('rt-'+i).value||('Rutin '+(i+1)));set('rc_routine',r);
+  $('rt-saved').textContent='✓ sparat';setTimeout(()=>$('rt-saved').textContent='',2000);renderCal();}
+let calY,calM;
+function calMove(n){calM+=n;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;}renderCal();}
+function renderCal(){
+  const now=new Date();if(calY===undefined){calY=now.getFullYear();calM=now.getMonth();}
+  $('cal-title').textContent=MON[calM]+' '+calY;
+  $('cal-dow').innerHTML=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const first=new Date(calY,calM,1);const off=(first.getDay()+6)%7;const dim=new Date(calY,calM+1,0).getDate();
+  const days=get('rc_days',{}),logs=get('rc_log',[]),routine=get('rc_routine',DEFROUTINE);
+  let html='';for(let i=0;i<off;i++)html+='<div class="cell empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const rec=days[ds]||{};const dayLogs=logs.filter(e=>e.date===ds);
+    const rd=rec.readiness?{green:'var(--green)',amber:'var(--amber)',red:'var(--red)'}[rec.readiness.verdict]:null;
+    const rtDone=rec.routine?Object.values(rec.routine).filter(Boolean).length:0;
+    const isToday=ds===todayStr();
+    let dots='';if(rd)dots+=`<span class="dot" style="background:${rd}"></span>`;
+    dayLogs.forEach(e=>dots+=`<span class="dot" style="background:var(--gold)"></span>`);
+    const ss=dayLogs.slice(0,2).map(e=>e.type.replace('/Hammer','')).join(', ');
+    html+=`<div class="cell${isToday?' today':''}" onclick="openDay('${ds}')">
+      <div class="dn">${d}</div><div class="dots">${dots}</div>
+      ${ss?`<div class="ss">${ss}</div>`:''}
+      <div class="rt">${rtDone}/5</div></div>`;
+  }
+  $('cal-grid').innerHTML=html;
 }
-function importCSV(inp){
-  const f=inp.files[0]; if(!f)return; const rd=new FileReader();
-  rd.onload=ev=>{
-    const lines=ev.target.result.split(/\r?\n/).filter(l=>l.trim());
-    const h=lines.shift().split(',').map(s=>s.replace(/"/g,'').trim());
-    const a=getLog();
-    lines.forEach(l=>{
-      const cells=l.match(/("([^"]|"")*"|[^,]*)/g).filter((_,i)=>i%2===0).map(c=>c.replace(/^"|"$/g,'').replace(/""/g,'"'));
-      const o={}; h.forEach((k,i)=>o[k]=cells[i]||''); if(o.date)a.push(o);
-    });
-    setLog(a); alert('Import klar.');
-  };
-  rd.readAsText(f);
+function openDay(ds){
+  const days=get('rc_days',{}),routine=get('rc_routine',DEFROUTINE),logs=get('rc_log',[]).filter(e=>e.date===ds);
+  const rec=days[ds]||{};const rt=rec.routine||{};
+  const dd=new Date(ds+'T00:00:00');
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <h2 style="font-size:1.1rem">${DOW[(dd.getDay()+6)%7]} ${ds}</h2>
+    <button class="ghost tiny" onclick="closeDay()">Stäng ✕</button></div>`;
+  h+='<h3 style="font-size:.95rem;color:var(--gold);margin-bottom:4px">Dagliga rutiner</h3>';
+  h+=routine.map((x,i)=>`<div class="chk"><input type="checkbox" id="dc-${i}" ${rt[i]?'checked':''} onchange="toggleRoutine('${ds}',${i})"><label for="dc-${i}">${x||('Rutin '+(i+1))}</label></div>`).join('');
+  if(rec.readiness){const v=readinessVerdict(rec.readiness);
+    h+=`<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Readiness</h3><div class="verdict ${v.cls}" style="font-size:.86rem">${v.txt}</div>`;}
+  h+='<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Pass</h3>';
+  h+=logs.length?logs.map(e=>`<div class="dayrow"><span class="pill ${typeCls(e.type)}">${e.type}</span><span>${e.desc||''} ${e.pace?('· '+e.pace):''} ${e.lac?('· '+e.lac+'mmol'):''} ${e.feel?('· '+e.feel):''}</span></div>`).join(''):'<p class="muted" style="font-size:.86rem">Inga pass loggade.</p>';
+  h+=`<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Dagsanteckning</h3>
+    <textarea id="dnote" oninput="saveDayNote('${ds}')">${rec.note||''}</textarea>`;
+  $('daybox').innerHTML=h;$('daymodal').classList.add('open');
+}
+function closeDay(){$('daymodal').classList.remove('open');renderCal();}
+$('daymodal').onclick=e=>{if(e.target.id==='daymodal')closeDay();};
+function toggleRoutine(ds,i){const days=get('rc_days',{});days[ds]=days[ds]||{};days[ds].routine=days[ds].routine||{};
+  days[ds].routine[i]=!days[ds].routine[i];set('rc_days',days);}
+function saveDayNote(ds){const days=get('rc_days',{});days[ds]=days[ds]||{};days[ds].note=$('dnote').value;set('rc_days',days);}
+
+/* ===== TRENDS (pure SVG) ===== */
+function chart(points,{color='var(--gold)',invert=false,bars=false,fmt=v=>v}={}){
+  if(!points.length)return'<p class="muted">Ingen data än — logga några pass.</p>';
+  const W=640,H=200,pad=40;const ys=points.map(p=>p.y);
+  let mn=Math.min(...ys),mx=Math.max(...ys);if(mn===mx){mn-=1;mx+=1;}
+  const n=points.length;
+  const xA=i=>pad+(n===1?(W-2*pad)/2:i*(W-2*pad)/(n-1));
+  const yA=v=>{let t=(v-mn)/(mx-mn);return invert?(pad+t*(H-2*pad)):(H-pad-t*(H-2*pad));};
+  let g='';for(let k=0;k<=3;k++){const y=pad+k*(H-2*pad)/3;const val=invert?mn+(k/3)*(mx-mn):mx-(k/3)*(mx-mn);
+    g+=`<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="var(--line)" stroke-width="1"/>
+    <text x="4" y="${y+4}" fill="var(--muted)" font-size="10">${fmt(val)}</text>`;}
+  let body='';
+  if(bars){const bw=(W-2*pad)/n*0.6;points.forEach((p,i)=>{const x=xA(i),y=yA(p.y);
+    body+=`<rect x="${x-bw/2}" y="${y}" width="${bw}" height="${H-pad-y}" fill="${color}" rx="3"><title>${p.x}: ${fmt(p.y)}</title></rect>`;});}
+  else{const dpath=points.map((p,i)=>(i?'L':'M')+xA(i)+' '+yA(p.y)).join(' ');
+    body+=`<path d="${dpath}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+    points.forEach((p,i)=>{body+=`<circle cx="${xA(i)}" cy="${yA(p.y)}" r="3.5" fill="${color}"><title>${p.x}: ${fmt(p.y)}</title></circle>`;});}
+  const xl=`<text x="${pad}" y="${H-8}" fill="var(--muted)" font-size="10">${points[0].x}</text>
+    <text x="${W-pad}" y="${H-8}" fill="var(--muted)" font-size="10" text-anchor="end">${points[n-1].x}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}${body}${xl}</svg>`;
+}
+function renderTrends(){
+  const logs=get('rc_log',[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const ut2=logs.filter(e=>(e.type==='UT2'||e.type==='Lång UT2')&&p2s(e.pace)).map(e=>({x:e.date.slice(5),y:p2s(e.pace)}));
+  $('t-ut2').innerHTML=chart(ut2,{color:'var(--teal)',invert:true,fmt:s2p});
+  const lac=logs.filter(e=>e.lac&&parseFloat((''+e.lac).replace(',','.'))).map(e=>({x:e.date.slice(5),y:parseFloat((''+e.lac).replace(',','.'))}));
+  $('t-lac').innerHTML=chart(lac,{color:'var(--red)',invert:true,fmt:v=>v.toFixed(1)});
+  // weekly volume
+  const wk={};logs.forEach(e=>{if(!e.dist)return;const m=mondayOf(e.date);wk[m]=(wk[m]||0)+(+e.dist||0);});
+  const vol=Object.keys(wk).sort().slice(-12).map(m=>({x:m.slice(5),y:Math.round(wk[m])}));
+  $('t-vol').innerHTML=chart(vol,{color:'var(--gold)',bars:true,fmt:v=>(v/1000).toFixed(1)+'k'});
+  const hr=logs.filter(e=>+e.hr).map(e=>({x:e.date.slice(5),y:+e.hr}));
+  $('t-hr').innerHTML=chart(hr,{color:'var(--blue)',invert:true,fmt:v=>Math.round(v)});
 }
 
-/* ---------- init ---------- */
-$('l-date').value=new Date().toISOString().slice(0,10);
-loadProfile(); renderDash(); renderLog();
+/* ===== reference plans ===== */
+const PETE='<p class="sub">Kontinuerlig 3-veckorscykel: 1 fart + 1 tröskel + UT2-distans (22–25 spm), 1 vilodag. Matcha förra snittet, sista repet all-out.</p>'+
+[['Vecka 1','8×500m / 3:30','5×1500m / 5:00'],['Vecka 2','Pyramid 250–1k','4×2000m / 5:00'],['Vecka 3','4×1000m / 5:00','3k/2.5k/2k · 5:00']]
+.map(w=>`<details class="wk"><summary><span>${w[0]}</span></summary><div class="body"><div class="dayrow"><span class="pill p-spd">SPD</span><span>${w[1]}</span></div><div class="dayrow"><span class="pill p-at">AT</span><span>${w[2]}</span></div><div class="dayrow"><span>+ 3–4× UT2-distans · 1 hårt distanspass · 1 vilodag</span></div></div></details>`).join('');
+const BEG='<p class="sub">Din 24-v plan. UT2 låst 2:43 (≈1,8 mmol). Volym 8K→12K. AT 2:16→2:08, SPD 1:57→1:51.</p>'+
+[[1,'🔴 6×500m 1:57'],[7,'🔴 7×500m 1:56'],[12,'🟡 4×1500m 2:14'],[16,'🟡 5×1500m 2:12'],[20,'🟡 5×1500m 2:10'],[24,'🟡 5×1500m 2:08']]
+.map(w=>`<details class="wk"><summary><span>Vecka ${w[0]}</span></summary><div class="body"><div class="dayrow"><span class="pill p-ut2">UT2</span><span>Distans @ 2:43 · 22r</span></div><div class="dayrow"><span class="pill p-spd">Int</span><span>${w[1]}</span></div></div></details>`).join('')+'<div class="note">Efter v24: 8×500 på 1:51 = nytt 2k-riktmärke.</div>';
+const DAD='<p class="sub">12 v, 30–45 min/pass. Power/tempo + fart + volym + drag sprints. Kräver aktuellt 2k.</p>'+
+[[1,'6×500 (2k−1/2)','8000m @18spm'],[3,'10×250','8000m @20spm'],[6,'10×250 r2min','3×2000'],[9,'10×250 r1min','10k @18spm'],[12,'500/500/1250','🏁 2000m TT']]
+.map(w=>`<details class="wk"><summary><span>Vecka ${w[0]}</span></summary><div class="body"><div class="dayrow"><span class="pill p-spd">Fart</span><span>${w[1]}</span></div><div class="dayrow"><span class="pill p-ut2">Volym</span><span>${w[2]}</span></div></div></details>`).join('');
+const RACE='<p class="sub">Race Series 2000m TT-prep (rodd + ski). 6 pass/vecka-meny över 12 v, byggt kring ditt 2k-pace.</p><details class="wk" open><summary><span>Passtyper/vecka</span></summary><div class="body"><div class="dayrow"><span class="pill p-at">1</span><span>30 min single @18–22 spm</span></div><div class="dayrow"><span class="pill p-spd">2</span><span>Fartintervall (1250–250m)</span></div><div class="dayrow"><span class="pill p-at">3</span><span>Distansintervall 2000–2500m</span></div><div class="dayrow"><span class="pill p-spd">4</span><span>Korta fartrep / variabel rate</span></div><div class="dayrow"><span class="pill p-str">5</span><span>Drag sprints (+20–30 DF)</span></div><div class="dayrow"><span class="pill p-tt">6</span><span>Checkpoint · v12 = 2000m TT</span></div></div></details>';
+$('pete').innerHTML=PETE;$('beg').innerHTML=BEG;$('dad').innerHTML=DAD;$('race').innerHTML=RACE;
+
+/* ===== import custom plan ===== */
+function importPlan(inp){const f=inp.files[0];if(!f)return;const name=$('imp-name').value||f.name;
+  if(f.size>1800000){if(!confirm('Filen är stor ('+(f.size/1e6).toFixed(1)+' MB) och kan fylla webbläsarens lagring. Fortsätt?'))return;}
+  const rd=new FileReader();const ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext==='csv'){rd.onload=e=>{const rows=parseCSV(e.target.result);const ps=get('rc_plans',[]);
+    ps.push({name,type:'table',headers:rows[0],rows:rows.slice(1)});set('rc_plans',ps);renderMyPlans();$('imp-name').value='';};rd.readAsText(f);}
+  else{rd.onload=e=>{const ps=get('rc_plans',[]);ps.push({name,type:f.type.includes('pdf')?'pdf':'image',data:e.target.result});
+    try{set('rc_plans',ps);}catch(err){alert('Kunde inte spara — filen är för stor för webbläsarens lagring.');return;}
+    renderMyPlans();$('imp-name').value='';};rd.readAsDataURL(f);}}
+function delPlan(i){const ps=get('rc_plans',[]);ps.splice(i,1);set('rc_plans',ps);renderMyPlans();}
+function renderMyPlans(){const ps=get('rc_plans',[]);
+  $('my-plans').innerHTML=ps.length?ps.map((p,i)=>{
+    let inner='';
+    if(p.type==='table')inner=`<div style="overflow-x:auto"><table><thead><tr>${(p.headers||[]).map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${(p.rows||[]).map(r=>`<tr>${r.map(c=>`<td>${(c||'').replace(/\n/g,' / ')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    else if(p.type==='image')inner=`<div class="plan-att"><img src="${p.data}"></div>`;
+    else inner=`<div class="plan-att"><a href="${p.data}" target="_blank" class="ghost" style="display:inline-block;padding:8px 14px;border-radius:9px;text-decoration:none;margin-top:8px">Öppna PDF i ny flik</a></div>`;
+    return `<details class="wk"><summary><span>${p.name}</span><button class="act tiny ghost" onclick="event.preventDefault();delPlan(${i})">✕</button></summary><div class="body">${inner}</div></details>`;
+  }).join(''):'<p class="muted">Inga egna planer ännu. CSV blir spårbar tabell; bild/PDF blir referens.</p>';}
+
+/* ===== init ===== */
+$('l-date').value=todayStr();
+loadProfile();loadRoutine();renderDash();renderLog();renderMyPlans();renderCal();renderPlan();
 </script>
 </body>
 </html>
