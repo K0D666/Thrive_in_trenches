@@ -470,6 +470,12 @@ function openSettings(){
     </div>
     <h3 style="font-size:1rem;color:var(--gold);margin:16px 0 8px">Dagliga rutinpunkter (5)</h3>
     ${r.map((x,i)=>`<div style="margin-bottom:8px"><input id="rt-${i}" value="${(x||'').replace(/"/g,'&quot;')}"></div>`).join('')}
+    <h3 style="font-size:1rem;color:var(--gold);margin:16px 0 8px">Säkerhetskopia &amp; synk mellan enheter</h3>
+    <p class="sub" style="margin-bottom:8px">Exportera allt till en fil och importera på din andra enhet (via mejl eller molnlagring) — då ser laptop och telefon samma data.</p>
+    <div class="row-actions">
+      <button class="ghost" onclick="exportAll()">Exportera allt</button>
+      <label class="ghost" style="padding:8px 13px;border-radius:9px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;border:1px solid var(--gold);color:var(--gold)">Importera allt<input type="file" accept=".json" style="display:none" onchange="importAll(this)"></label>
+    </div>
     <div class="row-actions"><button class="act" onclick="saveSettings()">Spara</button></div>`;
   $('setmodal').classList.add('open');
 }
@@ -484,6 +490,15 @@ function saveSettings(){
   set('rc_routine',[0,1,2,3,4].map(i=>$('rt-'+i).value||('Rutin '+(i+1))));
   closeSet();renderDash();renderPlan();renderCal();
 }
+function exportAll(){const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('rc_'))data[k]=localStorage.getItem(k);}
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'}),u=URL.createObjectURL(blob),l=document.createElement('a');
+  l.href=u;l.download='roddcoach-backup-'+todayStr()+'.json';l.click();}
+function importAll(inp){const f=inp.files[0];if(!f)return;
+  if(!confirm('Importera säkerhetskopia? All nuvarande data på DEN HÄR enheten skrivs över.'))return;
+  const rd=new FileReader();rd.onload=e=>{try{const data=JSON.parse(e.target.result);
+    Object.keys(data).forEach(k=>{if(k.startsWith('rc_'))localStorage.setItem(k,data[k]);});
+    alert('Import klar — appen laddas om.');location.reload();}catch(err){alert('Kunde inte läsa filen — är det rätt backup-fil?');}};
+  rd.readAsText(f);}
 function renderProfStrip(){const p=get('rc_profile',{});
   $('av').src=p.img||'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54"><rect width="54" height="54" fill="#232017"/><text x="27" y="35" font-size="24" text-anchor="middle" fill="#d79a3e">🚣</text></svg>');
   $('pf-name').textContent=p.name||'Roddare';
