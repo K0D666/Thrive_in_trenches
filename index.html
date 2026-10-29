@@ -246,10 +246,8 @@
     <select id="trend-pick" onchange="renderTrends()">
       <optgroup label="Träning">
         <option value="ut2">UT2-pace</option>
-        <option value="lac">Laktat</option>
         <option value="hr">Snittpuls (pass)</option>
         <option value="vol">Veckovolym</option>
-        <option value="cum">Ackumulerad totalmeter</option>
       </optgroup>
       <optgroup label="Hälsa / återhämtning">
         <option value="weight">Vikt</option>
@@ -265,29 +263,6 @@
     <h2 id="trend-title"></h2>
     <p class="sub" id="trend-desc"></p>
     <div id="trend-area"></div>
-  </div>
-</section>
-
-<!-- PLANER -->
-<section id="plans" class="tab">
-  <div class="card"><h2>Importera egen plan</h2>
-    <p class="sub">CSV med en "Week/Vecka"-kolumn blir en spårbar, valbar veckoplan. Övrig CSV blir tabell; bild/PDF blir referens.</p>
-    <div class="row-actions">
-      <div style="flex:1;min-width:180px"><label>Plannamn</label><input id="imp-name" placeholder="t.ex. Build-fas v1"></div>
-      <label class="ghost" style="padding:10px 16px;border-radius:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;border:1px solid var(--gold);color:var(--gold);align-self:end">
-        Välj fil<input type="file" accept=".csv,image/*,.pdf" style="display:none" onchange="importPlan(this)"></label>
-    </div>
-    <div id="my-plans" style="margin-top:14px"></div>
-  </div>
-  <div class="card"><h2>Referensplaner</h2>
-    <div class="subtabs">
-      <button class="active" data-sub="pete">Pete Plan</button>
-      <button data-sub="beg">24-v Beginner</button>
-      <button data-sub="dad">DAD Plan</button>
-      <button data-sub="race">Race Series</button>
-    </div>
-    <div id="pete" class="subview active"></div><div id="beg" class="subview"></div>
-    <div id="dad" class="subview"></div><div id="race" class="subview"></div>
   </div>
 </section>
 
@@ -308,7 +283,6 @@
   <button data-tab="plan"><span class="ic">📋</span>Följ</button>
   <button data-tab="log"><span class="ic">✍️</span>Logg</button>
   <button data-tab="trend"><span class="ic">📈</span>Trend</button>
-  <button data-tab="plans"><span class="ic">🗂️</span>Planer</button>
   <button data-tab="logic"><span class="ic">🧠</span>Logik</button>
 </nav>
 
@@ -456,6 +430,7 @@ function openSettings(){
         Byt bild<input type="file" accept="image/*" style="display:none" onchange="pickImg(this)"></label>
     </div>
     <div style="margin-bottom:12px"><label>Aktiv plan</label><select id="s-active">${allPlans().map(pl=>`<option value="${pl.id}" ${pl.id===act?'selected':''}>${pl.name}</option>`).join('')}</select></div>
+    <div style="margin-bottom:12px"><label>Importera plan (CSV med Vecka-kolumn)</label><input type="file" accept=".csv" onchange="importPlanGear(this)"></div>
     <div class="grid g2">
       <div><label>Namn</label><input id="s-name" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
       <div><label>Ålder</label><input id="s-age" type="number" value="${p.age||44}"></div>
@@ -466,7 +441,7 @@ function openSettings(){
       <div><label>UT2-laktat</label><input id="s-lac" value="${p.lac||'1,8'}"></div>
       <div><label>Vilopuls</label><input id="s-rhr" type="number" value="${p.rhr||''}"></div>
       <div><label>Maxpuls (Garmin/mätt)</label><input id="s-hrmax" type="number" placeholder="t.ex. 204 — tomt = åldersformel" value="${p.hrmax||''}"></div>
-      <div><label>Planens start (må v1)</label><input id="s-start" type="date" value="${p.start||''}"></div>
+      <div><label>Planens start (må v1)</label><input id="s-start" type="date" value="${p.start||'2026-10-12'}"></div>
     </div>
     <h3 style="font-size:1rem;color:var(--gold);margin:16px 0 8px">Dagliga rutinpunkter (5)</h3>
     ${r.map((x,i)=>`<div style="margin-bottom:8px"><input id="rt-${i}" value="${(x||'').replace(/"/g,'&quot;')}"></div>`).join('')}
@@ -498,6 +473,13 @@ function importAll(inp){const f=inp.files[0];if(!f)return;
   const rd=new FileReader();rd.onload=e=>{try{const data=JSON.parse(e.target.result);
     Object.keys(data).forEach(k=>{if(k.startsWith('rc_'))localStorage.setItem(k,data[k]);});
     alert('Import klar — appen laddas om.');location.reload();}catch(err){alert('Kunde inte läsa filen — är det rätt backup-fil?');}};
+  rd.readAsText(f);}
+function importPlanGear(inp){const f=inp.files[0];if(!f)return;const name=prompt('Namn på planen?',f.name.replace(/\.csv$/i,''))||f.name;
+  const rd=new FileReader();rd.onload=e=>{const rows=parseCSV(e.target.result),H=rows[0]||[],wi=H.findIndex(h=>/week|vecka/i.test(h));
+    if(wi<0){alert('Hittade ingen "Vecka/Week"-kolumn — kan inte göra en spårbar plan av filen.');return;}
+    const w=weeklyFromCSV(rows,wi),ps=get('rc_plans',[]);ps.push({name,type:'weekly',mapped:w.mapped,weeks:w.weeks});set('rc_plans',ps);
+    const sel=$('s-active');if(sel){sel.innerHTML=allPlans().map(pl=>`<option value="${pl.id}">${pl.name}</option>`).join('');sel.value='csv'+(ps.length-1);}
+    alert('Plan importerad och vald i listan. Klicka Spara för att aktivera.');};
   rd.readAsText(f);}
 function renderProfStrip(){const p=get('rc_profile',{});
   $('av').src=p.img||'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54"><rect width="54" height="54" fill="#232017"/><text x="27" y="35" font-size="24" text-anchor="middle" fill="#d79a3e">🚣</text></svg>');
@@ -675,14 +657,14 @@ function renderCal(){const now=new Date();if(calY===undefined){calY=now.getFullY
   const off=(new Date(calY,calM,1).getDay()+6)%7,dim=new Date(calY,calM+1,0).getDate(),days=get('rc_days',{}),logs=get('rc_log',[]);let html='';
   for(let i=0;i<off;i++)html+='<div class="cell empty"></div>';
   for(let d=1;d<=dim;d++){const ds=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const rec=days[ds]||{},dl=logs.filter(e=>e.date===ds);
+    const rec=days[ds]||{},dl=logs.filter(e=>(e.date||'').slice(0,10)===ds);
     const rd=rec.readiness?{green:'var(--green)',amber:'var(--amber)',red:'var(--red)'}[rec.readiness.verdict]:null;
     const rt=rec.routine?Object.values(rec.routine).filter(Boolean).length:0;let dots='';
     if(rd)dots+=`<span class="dot" style="background:${rd}"></span>`;dl.forEach(()=>dots+='<span class="dot" style="background:var(--gold)"></span>');
     const ss=dl.slice(0,2).map(e=>e.type.replace('/Hammer','').replace('Styrka (KB)','KB')).join(', ');
     html+=`<div class="cell${ds===todayStr()?' today':''}" onclick="openDay('${ds}')"><div class="dn">${d}</div><div class="dots">${dots}</div>${ss?`<div class="ss">${ss}</div>`:''}<div class="rt">${rt}/5</div></div>`;}
   $('cal-grid').innerHTML=html;}
-function openDay(ds){const days=get('rc_days',{}),routine=get('rc_routine',DEFROUTINE),logs=get('rc_log',[]).filter(e=>e.date===ds),rec=days[ds]||{},rt=rec.routine||{};
+function openDay(ds){const days=get('rc_days',{}),routine=get('rc_routine',DEFROUTINE),logs=get('rc_log',[]).filter(e=>(e.date||'').slice(0,10)===ds),rec=days[ds]||{},rt=rec.routine||{};
   const dd=new Date(ds+'T00:00:00');
   let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="font-size:1.1rem">${DOW[(dd.getDay()+6)%7]} ${ds}</h2><button class="ghost tiny" onclick="closeDay()">Stäng ✕</button></div>`;
   h+='<h3 style="font-size:.95rem;color:var(--gold);margin-bottom:4px">Dagliga rutiner</h3>';
@@ -758,10 +740,6 @@ function renderTrends(){
 
 /* ===== reference + custom plans ===== */
 function refList(plan){return plan.weeks.map(w=>`<details class="wk"><summary><span>${w.label}${w.deload?' · DELOAD':''}</span></summary><div class="body">${w.sessions.map(s=>`<div class="dayrow">${s.day?`<span class="d">${s.day}</span>`:''}<span class="pill ${typeCls(s.type)}">${s.type}</span><span>${s.desc}</span></div>`).join('')}</div></details>`).join('');}
-$('pete').innerHTML='<p class="sub">3-veckorscykel: 1 fart + 1 tröskel + UT2-distans, 1 vilodag.</p>'+refList(buildPete());
-$('beg').innerHTML='<p class="sub">24-v. UT2 2:43 (≈1,8 mmol). Volym 8→12K.</p>'+refList(buildBeg());
-$('dad').innerHTML='<p class="sub">12 v, 30–45 min/pass.</p>'+refList(buildDad());
-$('race').innerHTML='<p class="sub">2000m TT-prep, 6 pass/vecka-meny.</p>'+refList(buildRace());
 function dayShort(h){const m=(h||'').toLowerCase();if(/mon|månd/.test(m))return'Mån';if(/tue|tis/.test(m))return'Tis';if(/wed|ons/.test(m))return'Ons';if(/thu|tors/.test(m))return'Tor';if(/fri|fre/.test(m))return'Fre';if(/sat|lör/.test(m))return'Lör';if(/sun|sön/.test(m))return'Sön';return null;}
 function weeklyFromCSV(rows,wi){const H=rows[0],dayCols=H.map((h,i)=>({i,day:dayShort(h)})).filter(c=>c.i!==wi);
   const mapped=dayCols.some(c=>c.day),weeks=[];
@@ -789,7 +767,7 @@ function renderMyPlans(){const ps=get('rc_plans',[]);
 
 /* ===== init ===== */
 $('l-date').value=todayStr();
-renderDash();renderLog();renderMyPlans();renderCal();renderPlan();
+renderDash();renderLog();renderCal();renderPlan();
 </script>
 </body>
 </html>
