@@ -338,23 +338,23 @@ function getCfg(){return Object.assign({},DEFCFG,get('rc_cfg',{}));}
 function tanakaMax(age){return Math.round(208-0.7*(+age||44));}
 function effMax(){const p=get('rc_profile',{});return +p.hrmax||tanakaMax(p.age);}
 function ut2Cap(cfg){cfg=cfg||getCfg();const p=get('rc_profile',{}),rest=+p.rhr||0,max=effMax();return rest?Math.round(rest+cfg.ut2Int*(max-rest)):Math.round(max*cfg.ut2Int);}
-function hrZones(){const p=get('rc_profile',{}),max=effMax(),rest=+p.rhr||0;
-  const z=[['UT2 (aerob bas)',0.55,0.70],['UT1 (övre aerob)',0.70,0.80],['AT (tröskel)',0.80,0.88],['TR (syretransport)',0.88,0.95],['AN (anaerob)',0.95,1.00]];
+function hrZones(){const cfg=getCfg(),p=get('rc_profile',{}),max=effMax(),rest=+p.rhr||0,i=cfg.ut2Int;
+  const z=[['UT2 (aerob bas)',0.55,i],['UT1 (övre aerob)',i,0.80],['AT (tröskel)',0.80,0.88],['TR (syretransport)',0.88,0.95],['AN (anaerob)',0.95,1.00]];
   const hr=f=>rest?Math.round(rest+f*(max-rest)):Math.round(f*max);
-  return z.map(x=>({name:x[0],lo:hr(x[1]),hi:hr(x[2])}));}
+  return z.map(x=>({name:x[0],lo:hr(x[1]),hi:hr(x[2]),loF:x[1],hiF:x[2]}));}
 function resetConfig(){set('rc_cfg',{});renderLogic();renderDash();}
 function saveConfig(){const c={},k=['ut2Int','amber','red','ramp','rpe','rhrUp','recUT2','recLUT2','recAT','recSPD','recSTR','recTT'];
   k.forEach(x=>{const el=$('cf-'+x);if(el&&el.value!=='')c[x]=parseFloat(el.value);});set('rc_cfg',c);renderLogic();renderDash();alert('Logiken uppdaterad.');}
 function renderLogic(){const cfg=getCfg(),p=get('rc_profile',{}),rhr=+p.rhr||0,max=effMax(),cap=ut2Cap(cfg),zones=hrZones(),
   maxSrc=(+p.hrmax)?'inmatad (Garmin/mätt)':('Tanaka 208−0,7×'+(p.age||44)),
-  pills=['p-ut2','p-lut2','p-at','p-tt','p-spd'],loP=[55,70,80,88,95],hiP=[70,80,88,95,100];
+  pills=['p-ut2','p-lut2','p-at','p-tt','p-spd'];
   $('logic-body').innerHTML=`
    <div class="metric" style="margin-bottom:14px"><small>Ditt UT2-pulströskel (tunbart)</small><div class="big">HR &lt; ${cap}</div>
      <div class="muted" style="font-size:.78rem;margin-top:6px">Maxpuls ${max} (${maxSrc}) · vilopuls ${rhr||'(ej satt)'} · Karvonen ${Math.round(cfg.ut2Int*100)}% av pulsreserven.</div></div>
    <h3 style="font-size:1rem;color:var(--gold);margin:4px 0 6px">Dina pulszoner</h3>
    <p class="sub">Karvonen: HR = vilopuls + andel × (maxpuls − vilopuls). Ändra max/vilopuls under ⚙️ så flyttas alla zoner.</p>
    <div style="overflow-x:auto"><table><thead><tr><th>Zon</th><th>Pulsintervall</th><th>% av reserv</th></tr></thead><tbody>
-     ${zones.map((z,i)=>`<tr><td><span class="pill ${pills[i]}">${z.name}</span></td><td>${z.lo}–${z.hi} bpm</td><td>${loP[i]}–${hiP[i]}%</td></tr>`).join('')}
+     ${zones.map((z,i)=>`<tr><td><span class="pill ${pills[i]}">${z.name}</span></td><td>${z.lo}–${z.hi} bpm</td><td>${Math.round(z.loF*100)}–${Math.round(z.hiF*100)}%</td></tr>`).join('')}
    </tbody></table></div>
    <div class="note">Din laktatmätning (141 bpm ≈ 2 mmol) är facit. Justera UT2-intensiteten nedan tills taket matchar. Med maxpuls ${max} och vilopuls ${rhr||'(sätt den)'} ger ${rhr&&max?('intensitet '+(((141-rhr)/(max-rhr)).toFixed(2))+' ≈ HR 141'):'… — fyll i vilopuls först'}.</div>
    <h3 style="font-size:1rem;color:var(--gold);margin:14px 0 8px">Så tänker coachen</h3>
