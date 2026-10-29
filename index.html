@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roddcoach · UT2 Engine Builder</title>
+<style>
+  :root{
+    --paper:#f7f3ec; --ink:#211d17; --muted:#6b6256;
+    --line:#e2d9c9; --card:#fffdf8;
+    --teal:#1f5a56; --teal-soft:#e4efed;
+    --clay:#b4542f; --clay-soft:#f6e7df;
+    --green:#3f7d54; --amber:#c98a21; --red:#b23b3b;
+    --blue:#2d6a8f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  h1,h2,h3{font-family:Georgia,Cambria,"Times New Roman",serif;font-weight:600;letter-spacing:-.01em}
+  header{padding:28px 20px 18px;border-bottom:1px solid var(--line);background:var(--card)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+  header h1{margin:0;font-size:1.9rem;color:var(--teal)}
+  header p{margin:4px 0 0;color:var(--muted);font-size:.95rem}
+  nav{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:2px;padding:6px 20px;max-width:1000px;margin:0 auto}
+  nav button{border:0;background:transparent;color:var(--muted);padding:10px 14px;border-radius:8px;
+    cursor:pointer;font-size:.92rem;font-weight:600}
+  nav button.active{background:var(--teal);color:#fff}
+  main{max-width:1000px;margin:24px auto;padding:0 20px}
+  .tab{display:none} .tab.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+  .card h2{margin:0 0 4px;font-size:1.25rem}
+  .card .sub{color:var(--muted);font-size:.88rem;margin:0 0 14px}
+  label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin:0 0 4px;text-transform:uppercase;letter-spacing:.03em}
+  input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+    background:#fff;font-size:.95rem;color:var(--ink);font-family:inherit}
+  textarea{min-height:52px;resize:vertical}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:1fr 1fr 1fr} .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  button.act{background:var(--clay);color:#fff;border:0;padding:10px 16px;border-radius:9px;font-weight:600;cursor:pointer;font-size:.92rem}
+  button.ghost{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+  button.tiny{padding:4px 9px;font-size:.78rem;border-radius:7px}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}
+  th{font-size:.73rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  tr:hover td{background:var(--teal-soft)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.74rem;font-weight:700}
+  .p-ut2{background:var(--teal-soft);color:var(--teal)}
+  .p-at{background:#fbf0d8;color:var(--amber)}
+  .p-spd{background:var(--clay-soft);color:var(--clay)}
+  .big{font-size:2.3rem;font-family:Georgia,serif;color:var(--teal);line-height:1}
+  .metric{background:var(--teal-soft);border-radius:12px;padding:14px}
+  .metric .big{font-size:1.7rem}
+  .metric small{display:block;color:var(--muted);text-transform:uppercase;font-size:.7rem;letter-spacing:.05em;margin-bottom:4px;font-weight:700}
+  .verdict{border-radius:12px;padding:16px;margin-top:14px;font-weight:600}
+  .v-green{background:#e7f1e9;color:var(--green);border:1px solid #bcd9c3}
+  .v-amber{background:#fbf2dc;color:var(--amber);border:1px solid #ecd79c}
+  .v-red{background:#f7e3e3;color:var(--red);border:1px solid #e3b6b6}
+  .note{font-size:.84rem;color:var(--muted);background:var(--clay-soft);border-left:3px solid var(--clay);padding:10px 12px;border-radius:0 8px 8px 0;margin-top:12px}
+  .wk{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .wk summary{cursor:pointer;padding:11px 14px;font-weight:700;background:#fcf8f0;list-style:none}
+  .wk summary::-webkit-details-marker{display:none}
+  .wk[open] summary{border-bottom:1px solid var(--line)}
+  .wk .body{padding:12px 14px;font-size:.9rem}
+  .wk .body div{padding:3px 0;border-bottom:1px dotted var(--line)}
+  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .subtabs button{background:#fcf8f0;border:1px solid var(--line);color:var(--muted);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85rem}
+  .subtabs button.active{background:var(--clay);color:#fff;border-color:var(--clay)}
+  .subview{display:none}.subview.active{display:block}
+  .row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .foot{color:var(--muted);font-size:.8rem;text-align:center;margin:30px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Roddcoach · UT2 Engine Builder</h1>
+    <p>Bygg maskinen. Consistency over perfection. Mål: 2k på 6:40.</p>
+  </div>
+</header>
+
+<nav>
+  <button class="active" data-tab="dash">Dashboard</button>
+  <button data-tab="calc">Pace-kalkylator</button>
+  <button data-tab="plans">Planer</button>
+  <button data-tab="log">Logg</button>
+  <button data-tab="about">Om / Data</button>
+</nav>
+
+<main>
+<!-- ================= DASHBOARD ================= -->
+<section id="dash" class="tab active">
+  <div class="card">
+    <h2>Min profil</h2>
+    <p class="sub">Sparas lokalt i din webbläsare. UT2-pace sätts från laktattest, inte uträknat.</p>
+    <div class="grid g4">
+      <div><label>Ålder</label><input id="pf-age" type="number"></div>
+      <div><label>Vikt-klass</label><select id="pf-weight"><option>Hwt</option><option>Lwt</option></select></div>
+      <div><label>2k-mål (m:ss)</label><input id="pf-goal" placeholder="6:40"></div>
+      <div><label>Nuvarande 2k-est. (m:ss)</label><input id="pf-cur" placeholder="7:24"></div>
+      <div><label>UT2-pace /500 (laktat)</label><input id="pf-ut2" placeholder="2:43"></div>
+      <div><label>UT2-laktat (mmol/L)</label><input id="pf-lac" placeholder="1,8"></div>
+      <div><label>Vilopuls (normal)</label><input id="pf-rhr" type="number" placeholder="52"></div>
+      <div><label>Drag factor</label><input id="pf-df" type="number" placeholder="118"></div>
+    </div>
+    <div class="row-actions"><button class="act" onclick="saveProfile()">Spara profil</button><span id="pf-saved" style="color:var(--green);font-size:.85rem"></span></div>
+  </div>
+
+  <div class="grid g3">
+    <div class="metric"><small>Mål-pace /500</small><div class="big" id="m-goal">1:40.0</div></div>
+    <div class="metric"><small>Mål-watt</small><div class="big" id="m-watt">—</div></div>
+    <div class="metric"><small>Kvar till mål /500</small><div class="big" id="m-gap">—</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Dagens readiness-check</h2>
+    <p class="sub">Svara innan passet. Appen avgör om du kör, drar ner eller vilar — byggd för att skydda en senior-kropp mot utbränning.</p>
+    <div class="grid g3">
+      <div><label>Sömn i natt</label><select id="r-sleep"><option value="0">Bra (7h+)</option><option value="1">Okej</option><option value="2">Dålig</option></select></div>
+      <div><label>Vilopuls i morse</label><select id="r-hr"><option value="0">Normal</option><option value="1">Lite förhöjd (+5–8)</option><option value="2">Klart förhöjd (+8)</option></select></div>
+      <div><label>Träningsvärk</label><select id="r-sore"><option value="0">Ingen/lätt</option><option value="1">En del</option><option value="2">Mycket</option></select></div>
+      <div><label>Energi / humör</label><select id="r-energy"><option value="0">Pigg</option><option value="1">Sådär</option><option value="2">Tom</option></select></div>
+      <div><label>Livsstress (jobb/barn)</label><select id="r-stress"><option value="0">Lugnt</option><option value="1">En del</option><option value="2">Hög belastning</option></select></div>
+      <div><label>Sjukdomstecken</label><select id="r-ill"><option value="0">Inga</option><option value="1">Ovanför halsen (snuva, lätt skav)</option><option value="3">Under halsen / feber / värk</option></select></div>
+    </div>
+    <div class="row-actions"><button class="act" onclick="readiness()">Bedöm dagen</button></div>
+    <div id="r-verdict"></div>
+  </div>
+</section>
+
+<!-- ================= CALC ================= -->
+<section id="calc" class="tab">
+  <div class="card">
+    <h2>Pace-kalkylator</h2>
+    <p class="sub">Mata in ett 2k-mål eller PB. Får ut tränings-pace (Pete Plan-relationer), 5k via Riegel, och watt per split.</p>
+    <div class="grid g3">
+      <div><label>2k-tid (m:ss)</label><input id="c-2k" value="6:40"></div>
+      <div><label>UT2-pace /500 (valfritt)</label><input id="c-ut2" placeholder="2:43"></div>
+      <div style="display:flex;align-items:end"><button class="act" style="width:100%" onclick="calc()">Räkna ut</button></div>
+    </div>
+    <div class="note">UT2 är aerob bas vid laktat under ~2 mmol/L och ska inte räknas från 2k — sätt det från laktattest. Lämnas fältet tomt uppskattas UT2 som 2k + 60 s som grov startpunkt.</div>
+  </div>
+  <div class="card" id="c-out" style="display:none">
+    <h2>Dina tränings-pace</h2>
+    <table>
+      <thead><tr><th>Pass</th><th>Typ</th><th>Mål /500</th><th>Watt</th><th>Grund</th></tr></thead>
+      <tbody id="c-rows"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= PLANS ================= -->
+<section id="plans" class="tab">
+  <div class="card">
+    <h2>Träningsplaner</h2>
+    <p class="sub">Fyra planer från din kunskapsbank. Backbone: mycket UT2-distans, ett fartpass + ett tröskelpass per vecka, alltid minst en vilodag.</p>
+    <div class="subtabs">
+      <button class="active" data-sub="pete">Pete Plan</button>
+      <button data-sub="beg">24-v Beginner</button>
+      <button data-sub="dad">DAD Plan</button>
+      <button data-sub="race">Race Series</button>
+    </div>
+    <div id="pete" class="subview active"></div>
+    <div id="beg" class="subview"></div>
+    <div id="dad" class="subview"></div>
+    <div id="race" class="subview"></div>
+  </div>
+</section>
+
+<!-- ================= LOG ================= -->
+<section id="log" class="tab">
+  <div class="card">
+    <h2>Nytt pass</h2>
+    <div class="grid g4">
+      <div><label>Datum</label><input id="l-date" type="date"></div>
+      <div><label>Typ</label><select id="l-type"><option>UT2</option><option>AT</option><option>SPD</option><option>Test/2k</option><option>Vila/Övrigt</option></select></div>
+      <div><label>Beskrivning</label><input id="l-desc" placeholder="60min / 8x500 ..."></div>
+      <div><label>Distans (m)</label><input id="l-dist" type="number"></div>
+      <div><label>Snitt-pace /500</label><input id="l-pace" placeholder="2:43"></div>
+      <div><label>Spm</label><input id="l-spm" type="number"></div>
+      <div><label>Snittpuls</label><input id="l-hr" type="number"></div>
+      <div><label>Laktat (mmol)</label><input id="l-lac" placeholder="1,8"></div>
+      <div><label>RPE 1–10</label><input id="l-rpe" type="number" min="1" max="10"></div>
+      <div style="grid-column:span 3"><label>Kommentar</label><input id="l-note"></div>
+    </div>
+    <div class="row-actions">
+      <button class="act" onclick="addLog()">Lägg till pass</button>
+      <button class="ghost" onclick="exportCSV()">Exportera CSV</button>
+      <label class="ghost" style="padding:10px 16px;border-radius:9px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;border:1px solid var(--teal);color:var(--teal);width:auto">
+        Importera CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
+      </label>
+    </div>
+  </div>
+  <div class="grid g4" id="log-stats"></div>
+  <div class="card">
+    <h2>Loggade pass</h2>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Datum</th><th>Typ</th><th>Beskrivning</th><th>m</th><th>/500</th><th>spm</th><th>HR</th><th>Lac</th><th>RPE</th><th></th></tr></thead>
+      <tbody id="log-rows"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="tab">
+  <div class="card">
+    <h2>Om appen</h2>
+    <p class="sub">En självständig coachningsapp för inomhusrodd — allt i en fil.</p>
+    <p style="font-size:.92rem">Byggd kring principerna i dina planer: bygg den aeroba motorn med stor volym UT2 vid laktatkalibrerad pace, lägg ovanpå ett fart- och ett tröskelpass per vecka, och respektera återhämtning. Readiness-checken följer "ovanför halsen"-regeln och väger in sömn, vilopuls, värk, energi och livsstress — extra viktigt för en vuxen atlet med jobb, barn och en kropp på 40+.</p>
+    <h3 style="margin-top:16px;font-size:1.05rem">Lägg på GitHub</h3>
+    <ol style="font-size:.9rem;color:var(--muted)">
+      <li>Skapa ett repo, lägg denna fil som <strong>index.html</strong>.</li>
+      <li>Settings → Pages → Branch: main → <strong>/ (root)</strong> → Save.</li>
+      <li>Appen ligger live på <code>https://&lt;användarnamn&gt;.github.io/&lt;repo&gt;/</code></li>
+    </ol>
+    <div class="note">All data sparas bara i din webbläsare (localStorage). Byter du enhet: exportera CSV och importera på nytt. Ingenting skickas någonstans.</div>
+    <div class="row-actions"><button class="ghost" onclick="if(confirm('Rensa ALL lokal data?')){localStorage.clear();location.reload()}">Rensa all data</button></div>
+  </div>
+</section>
+
+<p class="foot">Roddcoach · byggd för att bygga maskinen, inte bränna ut den.</p>
+</main>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+function p2s(str){ if(!str) return null; str=(''+str).replace(',','.').trim();
+  const m=str.match(/^(\d+):(\d+(?:\.\d+)?)$/); if(m) return +m[1]*60+ +m[2];
+  const f=parseFloat(str); return isNaN(f)?null:f; }
+function s2p(sec){ if(sec==null||isNaN(sec)) return '—'; const m=Math.floor(sec/60);
+  const s=(sec-m*60).toFixed(1); return m+':'+(s<10?'0':'')+s; }
+function watts(split500){ if(!split500) return '—'; const pace=split500/500;
+  return Math.round(2.80/Math.pow(pace,3)); }
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.tab).classList.add('active');
+});
+document.querySelectorAll('.subtabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.subtabs button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.subview').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.sub).classList.add('active');
+});
+
+/* ---------- profile ---------- */
+const PF='rc_profile';
+function saveProfile(){
+  const p={age:$('pf-age').value,weight:$('pf-weight').value,goal:$('pf-goal').value,
+    cur:$('pf-cur').value,ut2:$('pf-ut2').value,lac:$('pf-lac').value,
+    rhr:$('pf-rhr').value,df:$('pf-df').value};
+  localStorage.setItem(PF,JSON.stringify(p));
+  $('pf-saved').textContent='✓ sparat'; setTimeout(()=>$('pf-saved').textContent='',2000);
+  renderDash();
+}
+function loadProfile(){
+  const p=JSON.parse(localStorage.getItem(PF)||'{}');
+  $('pf-age').value=p.age||44; $('pf-weight').value=p.weight||'Hwt';
+  $('pf-goal').value=p.goal||'6:40'; $('pf-cur').value=p.cur||'';
+  $('pf-ut2').value=p.ut2||'2:43'; $('pf-lac').value=p.lac||'1,8';
+  $('pf-rhr').value=p.rhr||''; $('pf-df').value=p.df||'118';
+  return p;
+}
+function renderDash(){
+  const p=JSON.parse(localStorage.getItem(PF)||'{}');
+  const goal=p2s(p.goal||'6:40'); const gs=goal/4;
+  $('m-goal').textContent=s2p(gs);
+  $('m-watt').textContent=watts(gs);
+  const cur=p2s(p.cur); 
+  $('m-gap').textContent=cur?('-'+(cur/4-gs).toFixed(1)+'s'):'sätt 2k-est.';
+}
+
+/* ---------- readiness ---------- */
+function readiness(){
+  const ill=+$('r-ill').value;
+  const score=+$('r-sleep').value+ +$('r-hr').value+ +$('r-sore').value+
+    +$('r-energy').value+ +$('r-stress').value+ill;
+  const el=$('r-verdict'); let cls,txt;
+  if(ill>=3){ cls='v-red'; txt='🛑 VILA. Symtom under halsen eller feber — ingen hård träning. Låt immunförsvaret jobba, sov, drick. Tre vilodagar gör inget med din aeroba bas.'; }
+  else if(score>=7){ cls='v-red'; txt='🛑 VILA eller bara lätt rörlighet. Kroppen signalerar överbelastning. Att pressa idag kostar mer än det ger.'; }
+  else if(score>=4||ill===1){ cls='v-amber'; txt='🟡 DRA NER. Kör UT2 lugnt (puls under tröskel, aldrig hårdare än din UT2-pace), korta ner volymen, hoppa intervallerna. '+(ill===1?'Skav i halsen = max lätt UT2.':'Lyssna på kroppen under passet.'); }
+  else{ cls='v-green'; txt='🟢 KÖR PÅ. Grönt läge — genomför dagens planerade pass. Håll målpace, spara sista repet.'; }
+  el.className='verdict '+cls; el.textContent=txt;
+}
+
+/* ---------- calculator ---------- */
+function calc(){
+  const t2=p2s($('c-2k').value); if(!t2){alert('Ange 2k som m:ss');return;}
+  const p2k=t2/4;
+  const t5=t2*Math.pow(2.5,1.06); const p5=t5/10;      // Riegel 2k->5k
+  let ut2=p2s($('c-ut2').value); if(!ut2) ut2=p2k+60;
+  const rows=[
+    ['UT2 distans','p-ut2',ut2,'laktat/2k+60'],
+    ['8×500m','p-spd',p2k-3,'2k − 3s'],
+    ['Pyramid 250–1k','p-spd',p2k,'2k-pace'],
+    ['4×1000m','p-spd',p2k+1,'2k + 1s'],
+    ['5×1500m','p-at',p5,'5k-pace'],
+    ['4×2000m','p-at',p5+0.5,'5k + 0.5s'],
+    ['3k/2.5k/2k','p-at',p5+1,'5k + 1s'],
+  ];
+  $('c-rows').innerHTML=rows.map(r=>{
+    const lbl=r[1]==='p-ut2'?'UT2':r[1]==='p-at'?'AT':'SPD';
+    return `<tr><td>${r[0]}</td><td><span class="pill ${r[1]}">${lbl}</span></td>
+      <td><strong>${s2p(r[2])}</strong></td><td>${watts(r[2])} W</td><td style="color:var(--muted)">${r[3]}</td></tr>`;
+  }).join('');
+  $('c-out').style.display='block';
+}
+
+/* ---------- plans data ---------- */
+const PETE=`<p style="font-size:.92rem;color:var(--muted)">Kontinuerlig plan i 3-veckorscykel. 1 fartpass + 1 tröskelpass + resten UT2-distans (22–25 spm), 1 vilodag. Matcha förra passets snitt, kör sista repet all-out.</p>`+
+[['Vecka 1','8×500m / 3:30 vila','5×1500m / 5:00 vila'],
+ ['Vecka 2','Pyramid 250-500-750-1k-750-500-250','4×2000m / 5:00 vila'],
+ ['Vecka 3','4×1000m / 5:00 vila','3k / 2.5k / 2k · 5:00 vila']]
+ .map(w=>`<details class="wk"><summary>${w[0]}</summary><div class="body">
+   <div><span class="pill p-spd">SPD</span> ${w[1]}</div>
+   <div><span class="pill p-at">AT</span> ${w[2]}</div>
+   <div>+ 3–4× UT2-distans (~8–15k) och ett hårt distanspass · 1 vilodag</div></div></details>`).join('');
+
+const BEG=`<p style="font-size:.92rem;color:var(--muted)">Din skräddarsydda 24-v plan. UT2 låst 2:43 (≈1,8 mmol). Volym 8K→12K. AT 2:16→2:08, SPD 1:57→1:51.</p>`+
+[[1,'🔵 8000m','🔴 6×500m 1:57'],[4,'🔵 9000m','🔴 3×1000m 1:57'],[7,'🔵 10000m','🔴 7×500m 1:56'],
+ [10,'🔵 11000m','🟡 3×2000m 2:14'],[12,'🔵 11000m','🟡 4×1500m 2:14'],[16,'🔵 12000m','🟡 5×1500m 2:12'],
+ [20,'🔵 12000m','🟡 5×1500m 2:10'],[24,'🔵 12000m','🟡 5×1500m 2:08']]
+ .map(w=>`<details class="wk"><summary>Vecka ${w[0]}</summary><div class="body">
+   <div>D1 UT2-distans: ${w[1]} @ 2:43 · 22r</div>
+   <div>D2 Huvudintervall: ${w[2]}</div>
+   <div>D3 UT2 8000m @ 2:43 + valfria pass</div></div></details>`).join('')+
+ `<div class="note">Efter v24: 8×500 på 1:51 = nytt 2k-riktmärke. Testa 2k efter 2 vilodagar.</div>`;
+
+const DAD=`<p style="font-size:.92rem;color:var(--muted)">12 veckor, 30–45 min/pass. 30-min power/tempo + fartintervaller + volym + drag sprints. Kräver aktuellt 2k.</p>`+
+[[1,'30min @20spm (2k+16)','6×500 / 3min (2k −1/−2)','8000m @18spm (2k+19/20)','Drag: 4×(3×1:00) r24'],
+ [3,'30min @22spm (2k+14)','10×250 / 3min','8000m @20spm (2k+17/18)','Drag r28 · + 1000m 2k-prep'],
+ [6,'30min @18spm','10×250 / 2min','3×2000 r24/26/28','+ 1250m 2k-prep'],
+ [9,'30min @20spm','10×250 / 1min','10k @18spm','+ 1500m 2k-prep'],
+ [12,'30min @18spm','500/500/1250 @2k','3×3000 r20','🏁 2000m TIME TRIAL']]
+ .map(w=>`<details class="wk"><summary>Vecka ${w[0]}</summary><div class="body">
+   <div><span class="pill p-at">Power/Tempo</span> ${w[1]}</div>
+   <div><span class="pill p-spd">Fart</span> ${w[2]}</div>
+   <div><span class="pill p-ut2">Volym</span> ${w[3]}</div>
+   <div>${w[4]}</div></div></details>`).join('');
+
+const RACE=`<p style="font-size:.92rem;color:var(--muted)">Race Series 2000m TT-prep (rodd + ski). 6 pass/vecka-meny över 12 veckor, byggd kring ditt 2k-pace. Välj det du hinner.</p>`+
+`<details class="wk" open><summary>Passtyper varje vecka</summary><div class="body">
+  <div><span class="pill p-at">1</span> 30 min single @ 18–22 spm (power/tempo)</div>
+  <div><span class="pill p-spd">2</span> Fartintervall (1250/1000/750/500/250m, open rate)</div>
+  <div><span class="pill p-at">3</span> Distansintervall 2000–2500m, stegrad rate</div>
+  <div><span class="pill p-spd">4</span> Korta fartrep / variabel rate</div>
+  <div><span class="pill p-ut2">5</span> Drag sprints (1min/40s/30s, +20–30 DF)</div>
+  <div><span class="pill p-spd">6</span> Checkpoint / variabla rate-pass</div>
+  <div>Vecka 12 avslutas med 2000m TT.</div></div></details>
+  <div class="note">Pacing-tips: antingen starta snabbt och håll ut, eller starta konservativt och bygg fart. Allt paceat mot 2k-målet.</div>`;
+$('pete').innerHTML=PETE; $('beg').innerHTML=BEG; $('dad').innerHTML=DAD; $('race').innerHTML=RACE;
+
+/* ---------- log ---------- */
+const LG='rc_log';
+function getLog(){return JSON.parse(localStorage.getItem(LG)||'[]');}
+function setLog(a){localStorage.setItem(LG,JSON.stringify(a));renderLog();}
+function addLog(){
+  const e={date:$('l-date').value||new Date().toISOString().slice(0,10),
+    type:$('l-type').value,desc:$('l-desc').value,dist:$('l-dist').value,
+    pace:$('l-pace').value,spm:$('l-spm').value,hr:$('l-hr').value,
+    lac:$('l-lac').value,rpe:$('l-rpe').value,note:$('l-note').value};
+  const a=getLog(); a.push(e); setLog(a);
+  ['l-desc','l-dist','l-pace','l-spm','l-hr','l-lac','l-rpe','l-note'].forEach(i=>$(i).value='');
+}
+function delLog(i){const a=getLog();a.splice(i,1);setLog(a);}
+function renderLog(){
+  const a=getLog().slice().sort((x,y)=>y.date.localeCompare(x.date));
+  $('log-rows').innerHTML=a.map((e,idx)=>{
+    const real=getLog().indexOf(e);
+    const cls=e.type==='UT2'?'p-ut2':e.type==='AT'?'p-at':e.type==='SPD'?'p-spd':'';
+    return `<tr><td>${e.date}</td><td>${cls?`<span class="pill ${cls}">${e.type}</span>`:e.type}</td>
+      <td>${e.desc||''}</td><td>${e.dist||''}</td><td>${e.pace||''}</td><td>${e.spm||''}</td>
+      <td>${e.hr||''}</td><td>${e.lac||''}</td><td>${e.rpe||''}</td>
+      <td><button class="act tiny ghost" onclick="delLog(${real})">✕</button></td></tr>`;
+  }).join('')||'<tr><td colspan="10" style="color:var(--muted)">Inga pass ännu.</td></tr>';
+  // stats last 28 days
+  const cut=new Date(Date.now()-28*864e5).toISOString().slice(0,10);
+  const r=getLog().filter(e=>e.date>=cut);
+  const tot=r.reduce((s,e)=>s+(+e.dist||0),0);
+  const ut2m=r.filter(e=>e.type==='UT2').reduce((s,e)=>s+(+e.dist||0),0);
+  const sess=r.length;
+  const avgRpe=r.filter(e=>e.rpe).reduce((s,e,_,ar)=>s+(+e.rpe)/ar.length,0);
+  $('log-stats').innerHTML=`
+    <div class="metric"><small>Pass / 28 dgr</small><div class="big">${sess}</div></div>
+    <div class="metric"><small>Total meter / 28 dgr</small><div class="big">${(tot/1000).toFixed(1)}k</div></div>
+    <div class="metric"><small>UT2-andel</small><div class="big">${tot?Math.round(ut2m/tot*100):0}%</div></div>
+    <div class="metric"><small>Snitt-RPE</small><div class="big">${avgRpe?avgRpe.toFixed(1):'—'}</div></div>`;
+}
+function exportCSV(){
+  const a=getLog(); const h=['date','type','desc','dist','pace','spm','hr','lac','rpe','note'];
+  const csv=[h.join(',')].concat(a.map(e=>h.map(k=>`"${(e[k]||'').toString().replace(/"/g,'""')}"`).join(','))).join('\n');
+  const b=new Blob([csv],{type:'text/csv'}); const u=URL.createObjectURL(b);
+  const link=document.createElement('a'); link.href=u; link.download='roddlogg.csv'; link.click();
+}
+function importCSV(inp){
+  const f=inp.files[0]; if(!f)return; const rd=new FileReader();
+  rd.onload=ev=>{
+    const lines=ev.target.result.split(/\r?\n/).filter(l=>l.trim());
+    const h=lines.shift().split(',').map(s=>s.replace(/"/g,'').trim());
+    const a=getLog();
+    lines.forEach(l=>{
+      const cells=l.match(/("([^"]|"")*"|[^,]*)/g).filter((_,i)=>i%2===0).map(c=>c.replace(/^"|"$/g,'').replace(/""/g,'"'));
+      const o={}; h.forEach((k,i)=>o[k]=cells[i]||''); if(o.date)a.push(o);
+    });
+    setLog(a); alert('Import klar.');
+  };
+  rd.readAsText(f);
+}
+
+/* ---------- init ---------- */
+$('l-date').value=new Date().toISOString().slice(0,10);
+loadProfile(); renderDash(); renderLog();
+</script>
+</body>
+</html>
