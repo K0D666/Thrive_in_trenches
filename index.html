@@ -143,6 +143,17 @@
     <div class="row-actions"><button class="act" onclick="doReadiness()">Bedöm dagen</button><span id="r-saved" class="muted" style="font-size:.84rem"></span></div>
     <div id="r-verdict"></div>
   </div>
+  <div class="card"><h2>Dagens mätvärden</h2>
+    <p class="sub">Daglig hälsodata — matar trenderna. Sparas automatiskt för dagens datum.</p>
+    <div class="grid g3">
+      <div><label>Vikt (kg)</label><input id="md-weight" type="number" step="0.1" oninput="saveMetric(todayStr(),'weight',this.value)"></div>
+      <div><label>HRV (ms)</label><input id="md-hrv" type="number" oninput="saveMetric(todayStr(),'hrv',this.value)"></div>
+      <div><label>Vilopuls (bpm)</label><input id="md-rhr" type="number" oninput="saveMetric(todayStr(),'rhr',this.value)"></div>
+      <div><label>Kalorier brända</label><input id="md-cal" type="number" oninput="saveMetric(todayStr(),'cal',this.value)"></div>
+      <div><label>Sömn (timmar)</label><input id="md-sleepH" type="number" step="0.1" oninput="saveMetric(todayStr(),'sleepH',this.value)"></div>
+      <div><label>Sleep score</label><input id="md-sleepScore" type="number" oninput="saveMetric(todayStr(),'sleepScore',this.value)"></div>
+    </div>
+  </div>
   <div class="card"><h2>Återhämtning</h2>
     <p class="sub">Hur många timmar ditt senaste pass kräver innan nästa kvalitetspass.</p>
     <div id="recov"></div>
@@ -230,12 +241,31 @@
 
 <!-- TRENDER -->
 <section id="trend" class="tab">
-  <div class="note" style="margin-bottom:16px">Håll pekaren/fingret på en punkt för datum och värde. Extrema avvikare döljs automatiskt (antal visas per graf).</div>
-  <div class="card"><h2>UT2-pace över tid</h2><p class="sub">Din motor. Högre = snabbare. Endast UT2 & Lång UT2.</p><div id="t-ut2"></div></div>
-  <div class="card"><h2>Laktat över tid</h2><p class="sub">Lägre laktat vid samma pace = mer mitokondrier.</p><div id="t-lac"></div></div>
-  <div class="card"><h2>Ackumulerad totalmeter</h2><p class="sub">Alla meter du rott, summerat. Maskinen byggs meter för meter.</p><div id="t-cum"></div></div>
-  <div class="card"><h2>Veckovolym (meter)</h2><p class="sub">Per vecka (veckonr + måndagsdatum vid hover).</p><div id="t-vol"></div></div>
-  <div class="card"><h2>Snittpuls över tid</h2><p class="sub">Hover visar datum + passtyp. Lägre puls på samma pace = bättre ekonomi.</p><div id="t-hr"></div></div>
+  <div class="card">
+    <label>Välj trend</label>
+    <select id="trend-pick" onchange="renderTrends()">
+      <optgroup label="Träning">
+        <option value="ut2">UT2-pace</option>
+        <option value="lac">Laktat</option>
+        <option value="hr">Snittpuls (pass)</option>
+        <option value="vol">Veckovolym</option>
+        <option value="cum">Ackumulerad totalmeter</option>
+      </optgroup>
+      <optgroup label="Hälsa / återhämtning">
+        <option value="weight">Vikt</option>
+        <option value="hrv">HRV</option>
+        <option value="rhr">Vilopuls (morgon)</option>
+        <option value="sleepH">Sömntimmar</option>
+        <option value="sleepScore">Sleep score</option>
+        <option value="cal">Kalorier brända</option>
+      </optgroup>
+    </select>
+  </div>
+  <div class="card">
+    <h2 id="trend-title"></h2>
+    <p class="sub" id="trend-desc"></p>
+    <div id="trend-area"></div>
+  </div>
 </section>
 
 <!-- PLANER -->
@@ -261,16 +291,25 @@
   </div>
 </section>
 
+<!-- LOGIK -->
+<section id="logic" class="tab">
+  <div class="card"><h2>Coach-logik</h2>
+    <p class="sub">Här ser du exakt hur appen tänker — och kan finjustera parametrarna. Allt sparas lokalt.</p>
+    <div id="logic-body"></div>
+  </div>
+</section>
+
 <p class="foot">Roddcoach · all data lever i din webbläsare.</p>
 </main>
 
 <nav>
   <button class="active" data-tab="dash"><span class="ic">🏠</span>Hem</button>
-  <button data-tab="cal"><span class="ic">📅</span>Kalender</button>
-  <button data-tab="plan"><span class="ic">📋</span>Uppföljn.</button>
+  <button data-tab="cal"><span class="ic">📅</span>Kal.</button>
+  <button data-tab="plan"><span class="ic">📋</span>Följ</button>
   <button data-tab="log"><span class="ic">✍️</span>Logg</button>
-  <button data-tab="trend"><span class="ic">📈</span>Trender</button>
+  <button data-tab="trend"><span class="ic">📈</span>Trend</button>
   <button data-tab="plans"><span class="ic">🗂️</span>Planer</button>
+  <button data-tab="logic"><span class="ic">🧠</span>Logik</button>
 </nav>
 
 <div class="modal" id="daymodal"><div class="box" id="daybox"></div></div>
@@ -294,12 +333,52 @@ function isoWeek(s){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+4-((d.
 function get(k,def){try{const v=JSON.parse(localStorage.getItem(k));return v??def}catch(e){return def}}
 function set(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function typeCls(t){return{'UT2':'p-ut2','Lång UT2':'p-lut2','AT':'p-at','SPD/Hammer':'p-spd','Styrka (KB)':'p-str','Test/2k':'p-tt'}[t]||''}
+const DEFCFG={ut2Int:0.70,amber:4,red:7,ramp:1.4,rpe:7.5,rhrUp:5,recUT2:10,recLUT2:18,recAT:34,recSPD:44,recSTR:24,recTT:60};
+function getCfg(){return Object.assign({},DEFCFG,get('rc_cfg',{}));}
+function hrmax(age){return Math.round(208-0.7*(+age||44));}
+function ut2Cap(age,rhr,cfg){cfg=cfg||getCfg();const hm=hrmax(age),rest=+rhr||0;return rest?Math.round(rest+cfg.ut2Int*(hm-rest)):Math.round(hm*cfg.ut2Int);}
+function resetConfig(){set('rc_cfg',{});renderLogic();renderDash();}
+function saveConfig(){const c={},k=['ut2Int','amber','red','ramp','rpe','rhrUp','recUT2','recLUT2','recAT','recSPD','recSTR','recTT'];
+  k.forEach(x=>{const el=$('cf-'+x);if(el&&el.value!=='')c[x]=parseFloat(el.value);});set('rc_cfg',c);renderLogic();renderDash();alert('Logiken uppdaterad.');}
+function renderLogic(){const cfg=getCfg(),p=get('rc_profile',{}),age=+p.age||44,rhr=+p.rhr||0,cap=ut2Cap(age,rhr,cfg),hm=hrmax(age);
+  $('logic-body').innerHTML=`
+   <div class="metric" style="margin-bottom:16px"><small>Din åldersanpassade UT2-pulströskel</small><div class="big">HR &lt; ${cap}</div>
+     <div class="muted" style="font-size:.78rem;margin-top:6px">Tanaka HRmax ${hm} (208−0,7×${age}) · Karvonen: vilopuls ${rhr||'(ej satt — sätt den under ⚙️ för exakt tak)'} + ${Math.round(cfg.ut2Int*100)}% av pulsreserven.</div></div>
+   <h3 style="font-size:1rem;color:var(--gold);margin:4px 0 8px">Så tänker coachen</h3>
+   <ul style="font-size:.86rem;line-height:1.6;padding-left:18px;margin:0 0 14px">
+     <li><strong>Dagens split-tips</strong> utgår från planens pass och justeras efter readiness, återhämtning från förra passet, volymökning, snitt-RPE senaste veckan och <strong>din vilopuls i morse mot din normala vilopuls</strong>.</li>
+     <li><strong>UT2-taket</strong> räknas åldersanpassat (Tanaka + Karvonen) ur ålder och vilopuls — inte en fast siffra.</li>
+     <li><strong>Readiness</strong> = summan av 6 svar. Gul vid ≥ ${cfg.amber}, röd vid ≥ ${cfg.red} (eller symtom under halsen).</li>
+     <li><strong>Återhämtningstimmar</strong> = bastimmar per passtyp × faktor från RPE/känsla.</li>
+     <li><strong>Överansträngning</strong> flaggas vid rött readiness, känsla "Överansträngd" eller RPE ≥ 9 — och följs upp nästa dag.</li>
+     <li><strong>Trender</strong> döljer extremvärden (robust median-metod) för tydlighet.</li>
+   </ul>
+   <h3 style="font-size:1rem;color:var(--gold);margin:4px 0 8px">Finjustera</h3>
+   <div class="grid g3">
+     <div><label>UT2-intensitet (andel av HRR)</label><input id="cf-ut2Int" type="number" step="0.01" value="${cfg.ut2Int}"></div>
+     <div><label>Readiness gul ≥</label><input id="cf-amber" type="number" value="${cfg.amber}"></div>
+     <div><label>Readiness röd ≥</label><input id="cf-red" type="number" value="${cfg.red}"></div>
+     <div><label>Volymökning-varning (kvot)</label><input id="cf-ramp" type="number" step="0.1" value="${cfg.ramp}"></div>
+     <div><label>Hög RPE-varning ≥</label><input id="cf-rpe" type="number" step="0.1" value="${cfg.rpe}"></div>
+     <div><label>Förhöjd vilopuls (+bpm)</label><input id="cf-rhrUp" type="number" value="${cfg.rhrUp}"></div>
+   </div>
+   <h3 style="font-size:1rem;color:var(--gold);margin:14px 0 8px">Återhämtningstimmar per passtyp</h3>
+   <div class="grid g3">
+     <div><label>UT2</label><input id="cf-recUT2" type="number" value="${cfg.recUT2}"></div>
+     <div><label>Lång UT2</label><input id="cf-recLUT2" type="number" value="${cfg.recLUT2}"></div>
+     <div><label>AT</label><input id="cf-recAT" type="number" value="${cfg.recAT}"></div>
+     <div><label>SPD/Hammer</label><input id="cf-recSPD" type="number" value="${cfg.recSPD}"></div>
+     <div><label>Styrka</label><input id="cf-recSTR" type="number" value="${cfg.recSTR}"></div>
+     <div><label>Test/2k</label><input id="cf-recTT" type="number" value="${cfg.recTT}"></div>
+   </div>
+   <div class="row-actions"><button class="act" onclick="saveConfig()">Spara logik</button><button class="ghost" onclick="resetConfig()">Återställ standard</button></div>`;
+}
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');$(b.dataset.tab).classList.add('active');window.scrollTo(0,0);
-  if(b.dataset.tab==='trend')renderTrends();if(b.dataset.tab==='cal')renderCal();if(b.dataset.tab==='plan')renderPlan();
+  if(b.dataset.tab==='trend')renderTrends();if(b.dataset.tab==='cal')renderCal();if(b.dataset.tab==='plan')renderPlan();if(b.dataset.tab==='logic')renderLogic();
 });
 document.querySelectorAll('.subtabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.subtabs button').forEach(x=>x.classList.remove('active'));
@@ -395,6 +474,8 @@ function renderProfStrip(){const p=get('rc_profile',{});
   $('av').src=p.img||'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54"><rect width="54" height="54" fill="#232017"/><text x="27" y="35" font-size="24" text-anchor="middle" fill="#d79a3e">🚣</text></svg>');
   $('pf-name').textContent=p.name||'Roddare';
   $('pf-line').textContent=`${p.age||''} år · ${p.weight||'Hwt'} · mål ${p.goal||'6:40'} · UT2 ${p.ut2||'2:43'}`;}
+function saveMetric(date,field,val){const days=get('rc_days',{});days[date]=days[date]||{};days[date].metrics=days[date].metrics||{};days[date].metrics[field]=val;set('rc_days',days);}
+function fillMetricInputs(){const m=(get('rc_days',{})[todayStr()]||{}).metrics||{};['weight','hrv','rhr','cal','sleepH','sleepScore'].forEach(f=>{const el=$('md-'+f);if(el)el.value=m[f]||'';});}
 
 /* ===== dashboard ===== */
 function renderDash(){renderProfStrip();
@@ -402,7 +483,7 @@ function renderDash(){renderProfStrip();
   $('m-goal').textContent=s2p(gs);$('m-watt').textContent=watts(gs)+' W';
   const cur=p2s(p.cur);$('m-gap').textContent=cur?('-'+(cur/4-gs).toFixed(1)+'s'):'sätt est.';
   $('m-week').textContent=p.start?('v'+curWeek(getActivePlan())):'—';
-  renderToday();renderRecovery();renderOvertrain();}
+  renderToday();renderRecovery();renderOvertrain();fillMetricInputs();}
 function renderToday(){
   const plan=getActivePlan(),p=get('rc_profile',{}),t=todayStr(),el=$('today');
   if(!p.start){el.innerHTML='<p class="muted">Sätt planens startdatum under ⚙️ så visas dagens pass här.</p>';return;}
@@ -432,7 +513,7 @@ function genTip(){const days=get('rc_days',{}),t=todayStr();const rv=days[t]&&da
   let tip=rv==='red'?'🛑 Rött readiness — vila eller lätt mobilitet idag.':(rv==='amber'||!rec)?'🟡 Dra ner: lugnt UT2-pass idag, spara kvalitet tills du är fräsch.':'🟢 Grönt — kör veckans kvalitetspass om du inte redan gjort det, annars UT2.';
   return `<div class="verdict v-amber" style="background:var(--gold-soft);color:var(--text);border-color:var(--line)"><strong style="color:var(--gold)">Coachens tips:</strong> ${tip}</div>`;}
 function dailyTip(info){
-  const p=get('rc_profile',{}),logs=get('rc_log',[]),days=get('rc_days',{}),t=todayStr();
+  const cfg=getCfg(),p=get('rc_profile',{}),logs=get('rc_log',[]),days=get('rc_days',{}),t=todayStr();
   const rv=days[t]&&days[t].readiness?days[t].readiness.verdict:null;
   const last7=logs.filter(e=>e.date>addDays(t,-7)&&e.date<=t),vol7=last7.reduce((s,e)=>s+(+e.dist||0),0);
   const prev7=logs.filter(e=>e.date>addDays(t,-14)&&e.date<=addDays(t,-7)).reduce((s,e)=>s+(+e.dist||0),0);
@@ -440,24 +521,29 @@ function dailyTip(info){
   const rpes=last7.filter(e=>e.rpe).map(e=>+e.rpe),avgRpe=rpes.length?rpes.reduce((a,b)=>a+b,0)/rpes.length:null;
   const ls=logs.slice().sort((a,b)=>b.date.localeCompare(a.date)),last=ls[0];let rec=true;
   if(last){const h=recoveryHours(last),d=new Date(last.date+'T12:00:00');d.setHours(d.getHours()+h);rec=new Date()>=d;}
-  const flags=[];if(ramp&&ramp>1.4)flags.push('volymen har ökat snabbt senaste veckan');
-  if(avgRpe&&avgRpe>7.5)flags.push('hög RPE ('+avgRpe.toFixed(1)+') senaste veckan');if(!rec)flags.push('du är inte fullt återhämtad');
+  const age=+p.age||44,baseRhr=+p.rhr||0,todayRhr=+(((days[t]&&days[t].metrics)||{}).rhr)||0,cap=ut2Cap(age,baseRhr,cfg);
+  const rhrUp=(baseRhr&&todayRhr&&todayRhr>baseRhr+cfg.rhrUp);
+  const flags=[];if(ramp&&ramp>cfg.ramp)flags.push('volymen har ökat snabbt senaste veckan');
+  if(avgRpe&&avgRpe>cfg.rpe)flags.push('hög RPE ('+avgRpe.toFixed(1)+') senaste veckan');
+  if(!rec)flags.push('du är inte fullt återhämtad');
+  if(rhrUp)flags.push('förhöjd vilopuls i morse (+'+(todayRhr-baseRhr)+' bpm)');
+  const fatig=(rv==='amber'||flags.length>0);
   const ut2=p2s(p.ut2)||163;let tip;
   if(rv==='red')tip='🛑 Readiness är rött idag — strunta i planen. Vila eller 20 min mobilitet.';
-  else if(!info)tip=rv==='amber'?'Vilodag + gult läge = perfekt att verkligen vila.':'Vilodag. Pigg? Valfri lugn UT2 30–40 min på ~'+s2p(ut2+5)+', annars vila.';
-  else if(info.type==='UT2'||info.type==='Lång UT2'){const slow=(rv==='amber'||flags.length)?'. Lägg dig i lugnare delen ~'+s2p(ut2+4)+' — '+(flags[0]||'gult läge'):'';
-    tip='Kör '+info.type+' på ~'+s2p(ut2)+'/500, HR <141, näsandning om du kan'+slow+'.';}
+  else if(!info)tip=fatig?'Vilodag + trötthetssignal = perfekt att verkligen vila.':'Vilodag. Pigg? Valfri lugn UT2 30–40 min på ~'+s2p(ut2+5)+' (HR <'+cap+'), annars vila.';
+  else if(info.type==='UT2'||info.type==='Lång UT2'){const slow=fatig?'. Lägg dig i lugnare delen ~'+s2p(ut2+4)+' — '+(flags[0]||'gult läge'):'';
+    tip='Kör '+info.type+' på ~'+s2p(ut2)+'/500, HR <'+cap+' (åldersanpassat), näsandning om du kan'+slow+'.';}
   else if(info.type==='Styrka (KB)')tip='Tung KB + mobilitet. Kvalitet före vikt, skydda ryggen. Ange RPE efteråt.';
   else{const m=(info.label||'').match(/(\d:\d\d)\s*[–-]\s*(\d:\d\d)/);
-    if(rv==='amber'||!rec)tip='⚠️ '+info.type+' planerat, men '+(flags[0]||'gult läge')+'. Skjut kvalitetspasset eller byt till lugn UT2 ~'+s2p(ut2)+'. Kvalitet kräver fräscha ben.';
-    else tip='🟢 Grönt för kvalitet. Målsplit '+(m?(m[1]+'–'+m[2]):'enligt planen')+'. Håll alla rep utom sista jämnt, sista all-out.'+(flags.length?' Obs: '+flags[0]+' — sikta på långsammare änden.':'');}
+    if(fatig)tip='⚠️ '+info.type+' planerat, men '+(flags[0]||'gult läge')+'. Skjut kvalitetspasset eller byt till lugn UT2 ~'+s2p(ut2)+' (HR <'+cap+'). Kvalitet kräver fräscha ben.';
+    else tip='🟢 Grönt för kvalitet. Målsplit '+(m?(m[1]+'–'+m[2]):'enligt planen')+'. Håll alla rep utom sista jämnt, sista all-out.';}
   return `<div class="verdict v-amber" style="background:var(--gold-soft);color:var(--text);border-color:var(--line)"><strong style="color:var(--gold)">Coachens tips:</strong> ${tip}</div>`;}
 
 /* ===== readiness / overtrain ===== */
-function readinessVerdict(v){const sc=v.sleep+v.hr+v.sore+v.energy+v.stress+v.ill;let cls,txt,key;
+function readinessVerdict(v){const cfg=getCfg(),sc=v.sleep+v.hr+v.sore+v.energy+v.stress+v.ill;let cls,txt,key;
   if(v.ill>=3){cls='v-red';key='red';txt='🛑 VILA. Symtom under halsen eller feber — ingen hård träning. Tre vilodagar gör inget med din aeroba bas.';}
-  else if(sc>=7){cls='v-red';key='red';txt='🛑 VILA eller lätt rörlighet. Kroppen signalerar överbelastning.';}
-  else if(sc>=4||v.ill===1){cls='v-amber';key='amber';txt='🟡 DRA NER. Lugn UT2, aldrig hårdare än UT2-pace. '+(v.ill===1?'Skav i halsen = max lätt UT2.':'');}
+  else if(sc>=cfg.red){cls='v-red';key='red';txt='🛑 VILA eller lätt rörlighet. Kroppen signalerar överbelastning.';}
+  else if(sc>=cfg.amber||v.ill===1){cls='v-amber';key='amber';txt='🟡 DRA NER. Lugn UT2, aldrig hårdare än UT2-pace. '+(v.ill===1?'Skav i halsen = max lätt UT2.':'');}
   else{cls='v-green';key='green';txt='🟢 KÖR PÅ. Grönt — genomför dagens pass, spara sista repet.';}return{sc,cls,txt,key};}
 function doReadiness(){const v={sleep:+$('r-sleep').value,hr:+$('r-hr').value,sore:+$('r-sore').value,energy:+$('r-energy').value,stress:+$('r-stress').value,ill:+$('r-ill').value};
   const r=readinessVerdict(v),days=get('rc_days',{}),t=todayStr();days[t]=days[t]||{};days[t].readiness={...v,verdict:r.key,sc:r.sc};set('rc_days',days);
@@ -470,9 +556,9 @@ function renderOvertrain(){const days=get('rc_days',{}),logs=get('rc_log',[]),t=
   if(!last)return;const checked=days[t]&&days[t].readiness;
   if(last===t)el.innerHTML='<div class="alert">⚠️ Du har flaggat överansträngning idag. Utmaning: vila eller mycket lätt rörlighet.</div>';
   else if(!checked){const dd=new Date(last+'T00:00:00');el.innerHTML='<div class="alert">⚠️ Du flaggade överansträngning '+DOW[(dd.getDay()+6)%7]+' '+last+'. Hur mår du idag? Gör en ny check — välj hellre vila/lätt om du är kvar i gropen.</div>';}}
-const RECOV={'UT2':10,'Lång UT2':18,'AT':34,'SPD/Hammer':44,'Styrka (KB)':24,'Test/2k':60,'Vila/Övrigt':2};
-function recoveryHours(e){let h=RECOV[e.type]??16;if(e.rpe)h*=(0.55+(+e.rpe)/11);
-  else if(e.feel){const f={'Lätt':0.7,'Okej':0.9,'Ansträngande':1.1,'Tungt':1.3,'Överansträngd':1.6}[e.feel];if(f)h*=f;}return Math.round(h);}
+const RECKEY={'UT2':'recUT2','Lång UT2':'recLUT2','AT':'recAT','SPD/Hammer':'recSPD','Styrka (KB)':'recSTR','Test/2k':'recTT'};
+function recoveryHours(e){const cfg=getCfg();let h=RECKEY[e.type]?cfg[RECKEY[e.type]]:(e.type==='Vila/Övrigt'?2:16);
+  if(e.rpe)h*=(0.55+(+e.rpe)/11);else if(e.feel){const f={'Lätt':0.7,'Okej':0.9,'Ansträngande':1.1,'Tungt':1.3,'Överansträngd':1.6}[e.feel];if(f)h*=f;}return Math.round(h);}
 function renderRecovery(){const logs=get('rc_log',[]).slice().sort((a,b)=>b.date.localeCompare(a.date)),el=$('recov');
   if(!logs.length){el.innerHTML='<p class="muted">Inga pass loggade än.</p>';return;}
   const last=logs[0],h=recoveryHours(last),end=new Date(last.date+'T12:00:00');end.setHours(end.getHours()+h);
@@ -575,6 +661,14 @@ function openDay(ds){const days=get('rc_days',{}),routine=get('rc_routine',DEFRO
   if(rec.readiness){const v=readinessVerdict(rec.readiness);h+=`<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Readiness</h3><div class="verdict ${v.cls}" style="font-size:.85rem">${v.txt}</div>`;}
   h+='<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Pass</h3>';
   h+=logs.length?logs.map(e=>`<div class="dayrow"><span class="pill ${typeCls(e.type)}">${e.type}</span><span>${e.desc||''} ${e.pace?('· '+e.pace):''} ${e.lac?('· '+e.lac+'mmol'):''} ${e.feel?('· '+e.feel):''}</span></div>`).join(''):'<p class="muted" style="font-size:.85rem">Inga pass loggade.</p>';
+  const mm=rec.metrics||{};
+  h+=`<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Mätvärden</h3><div class="grid g3">
+    <div><label>Vikt</label><input type="number" step="0.1" value="${mm.weight||''}" oninput="saveMetric('${ds}','weight',this.value)"></div>
+    <div><label>HRV</label><input type="number" value="${mm.hrv||''}" oninput="saveMetric('${ds}','hrv',this.value)"></div>
+    <div><label>Vilopuls</label><input type="number" value="${mm.rhr||''}" oninput="saveMetric('${ds}','rhr',this.value)"></div>
+    <div><label>Kalorier</label><input type="number" value="${mm.cal||''}" oninput="saveMetric('${ds}','cal',this.value)"></div>
+    <div><label>Sömn (h)</label><input type="number" step="0.1" value="${mm.sleepH||''}" oninput="saveMetric('${ds}','sleepH',this.value)"></div>
+    <div><label>Sleep score</label><input type="number" value="${mm.sleepScore||''}" oninput="saveMetric('${ds}','sleepScore',this.value)"></div></div>`;
   h+=`<h3 style="font-size:.95rem;color:var(--gold);margin:14px 0 4px">Dagsanteckning</h3><textarea id="dnote" oninput="saveDayNote('${ds}')">${rec.note||''}</textarea>`;
   $('daybox').innerHTML=h;$('daymodal').classList.add('open');}
 function closeDay(){$('daymodal').classList.remove('open');renderCal();}
@@ -604,19 +698,34 @@ function chart(points,{color='var(--gold)',invert=false,bars=false,fmt=v=>v}={})
     points.forEach((p,i)=>body+=`<circle cx="${xA(i)}" cy="${yA(p.y)}" r="4" fill="${color}" onmousemove="tipShow(event,'${p.t}')" onmouseout="tipHide()" ontouchstart="tipShow(event,'${p.t}')"/>`);}
   const step=Math.max(1,Math.floor(n/5));let xl='';for(let i=0;i<n;i+=step)xl+=`<text x="${xA(i)}" y="${H-8}" fill="var(--muted)" font-size="9" text-anchor="middle">${points[i].x}</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}${body}${xl}</svg>`;}
-function renderTrends(){const logs=get('rc_log',[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
-  const mk=(arr,fn,id)=>{const o=dropOutliers(arr);$(id).innerHTML=fn(o.pts)+(o.removed?`<p class="muted" style="font-size:.76rem;margin-top:6px">${o.removed} extremvärde(n) dolda.</p>`:'');};
-  const ut2=logs.filter(e=>(e.type==='UT2'||e.type==='Lång UT2')&&p2s(e.pace)).map(e=>({x:e.date.slice(5),y:p2s(e.pace),t:e.date+' · '+s2p(p2s(e.pace))+'/500'}));
-  mk(ut2,pts=>chart(pts,{color:'var(--teal)',invert:true,fmt:s2p}),'t-ut2');
-  const lac=logs.filter(e=>e.lac&&parseFloat((''+e.lac).replace(',','.'))).map(e=>({x:e.date.slice(5),y:parseFloat((''+e.lac).replace(',','.')),t:e.date+' · '+(''+e.lac).replace('.',',')+' mmol'}));
-  mk(lac,pts=>chart(pts,{color:'var(--red)',invert:true,fmt:v=>v.toFixed(1)}),'t-lac');
-  const cum=[];let run=0;logs.forEach(e=>{if(+e.dist){run+=(+e.dist);cum.push({x:e.date.slice(5),y:run,t:e.date+' · '+(run/1000).toFixed(1)+'k total'});}});
-  $('t-cum').innerHTML=cum.length?chart(cum,{color:'var(--gold)',fmt:v=>(v/1000).toFixed(0)+'k'}):'<p class="muted">Ingen data än.</p>';
-  const wk={};logs.forEach(e=>{if(!e.dist)return;const m=mondayOf(e.date);wk[m]=(wk[m]||0)+(+e.dist||0);});
-  const vol=Object.keys(wk).sort().slice(-12).map(m=>({x:'v'+isoWeek(m),y:Math.round(wk[m]),t:'Vecka '+isoWeek(m)+' ('+m+') · '+(wk[m]/1000).toFixed(1)+'k m'}));
-  mk(vol,pts=>chart(pts,{color:'var(--amber)',bars:true,fmt:v=>(v/1000).toFixed(1)+'k'}),'t-vol');
-  const hr=logs.filter(e=>+e.hr).map(e=>({x:e.date.slice(5),y:+e.hr,t:e.date+' · '+e.type+' · '+e.hr+' bpm'}));
-  mk(hr,pts=>chart(pts,{color:'var(--blue)',invert:true,fmt:v=>Math.round(v)}),'t-hr');}
+function renderTrends(){
+  const which=$('trend-pick')?$('trend-pick').value:'ut2';
+  const logs=get('rc_log',[]).slice().sort((a,b)=>a.date.localeCompare(b.date)),days=get('rc_days',{});
+  const metric=(f,unit)=>Object.keys(days).sort().filter(d=>days[d].metrics&&days[d].metrics[f]!==''&&days[d].metrics[f]!=null).map(d=>({x:d.slice(5),y:+(''+days[d].metrics[f]).replace(',','.'),t:d+' · '+days[d].metrics[f]+unit}));
+  let title,desc,pts=[],opts={},noOut=false;
+  if(which==='ut2'){title='UT2-pace över tid';desc='Din motor. Högre i grafen = snabbare. Endast UT2 & Lång UT2.';
+    pts=logs.filter(e=>(e.type==='UT2'||e.type==='Lång UT2')&&p2s(e.pace)).map(e=>({x:e.date.slice(5),y:p2s(e.pace),t:e.date+' · '+s2p(p2s(e.pace))+'/500'}));opts={color:'var(--teal)',invert:true,fmt:s2p};}
+  else if(which==='lac'){title='Laktat över tid';desc='Lägre laktat vid samma pace = mer mitokondrier. Högre i grafen = lägre laktat.';
+    pts=logs.filter(e=>e.lac&&parseFloat((''+e.lac).replace(',','.'))).map(e=>({x:e.date.slice(5),y:parseFloat((''+e.lac).replace(',','.')),t:e.date+' · '+(''+e.lac).replace('.',',')+' mmol'}));opts={color:'var(--red)',invert:true,fmt:v=>v.toFixed(1)};}
+  else if(which==='hr'){title='Snittpuls per pass';desc='Hover visar datum + passtyp. Lägre puls på samma pace = bättre ekonomi.';
+    pts=logs.filter(e=>+e.hr).map(e=>({x:e.date.slice(5),y:+e.hr,t:e.date+' · '+e.type+' · '+e.hr+' bpm'}));opts={color:'var(--blue)',invert:true,fmt:v=>Math.round(v)};}
+  else if(which==='vol'){title='Veckovolym (meter)';desc='Summerad distans per vecka. Hover visar veckonr + måndagsdatum.';
+    const wk={};logs.forEach(e=>{if(!e.dist)return;const m=mondayOf(e.date);wk[m]=(wk[m]||0)+(+e.dist||0);});
+    pts=Object.keys(wk).sort().slice(-12).map(m=>({x:'v'+isoWeek(m),y:Math.round(wk[m]),t:'Vecka '+isoWeek(m)+' ('+m+') · '+(wk[m]/1000).toFixed(1)+'k m'}));opts={color:'var(--amber)',bars:true,fmt:v=>(v/1000).toFixed(1)+'k'};noOut=true;}
+  else if(which==='cum'){title='Ackumulerad totalmeter';desc='Alla meter du rott, summerat över tid. Maskinen byggs meter för meter.';
+    let run=0;logs.forEach(e=>{if(+e.dist){run+=(+e.dist);pts.push({x:e.date.slice(5),y:run,t:e.date+' · '+(run/1000).toFixed(1)+'k total'});}});opts={color:'var(--gold)',fmt:v=>(v/1000).toFixed(0)+'k'};noOut=true;}
+  else if(which==='weight'){title='Vikt (kg)';desc='Daglig vikt. Mät gärna samma tid varje morgon för en jämn kurva.';pts=metric('weight',' kg');opts={color:'var(--teal)',fmt:v=>v.toFixed(1)};}
+  else if(which==='hrv'){title='HRV (ms)';desc='Högre HRV = bättre återhämtad. Sjunkande HRV flera dagar i rad = varningssignal.';pts=metric('hrv',' ms');opts={color:'var(--green)',fmt:v=>Math.round(v)};}
+  else if(which==='rhr'){title='Vilopuls (morgon)';desc='Lägre är bättre. Förhöjd morgonpuls flera dagar = trötthet eller begynnande infektion.';pts=metric('rhr',' bpm');opts={color:'var(--blue)',fmt:v=>Math.round(v)};}
+  else if(which==='sleepH'){title='Sömntimmar';desc='Sömn är din främsta återhämtning. Sikta på 7h+.';pts=metric('sleepH',' h');opts={color:'var(--blue)',fmt:v=>v.toFixed(1)};}
+  else if(which==='sleepScore'){title='Sleep score';desc='Högre = bättre sömnkvalitet enligt din klocka/ring.';pts=metric('sleepScore','');opts={color:'var(--green)',fmt:v=>Math.round(v)};}
+  else if(which==='cal'){title='Kalorier brända';desc='Daglig energiförbrukning. Bra att väga mot vikt och sömn.';pts=metric('cal',' kcal');opts={color:'var(--amber)',fmt:v=>Math.round(v)};}
+  $('trend-title').textContent=title;$('trend-desc').textContent=desc;
+  const area=$('trend-area');
+  if(!pts.length){area.innerHTML='<p class="muted">Ingen data än — fyll i under Dashboard (mätvärden) eller logga pass.</p>';return;}
+  const o=noOut?{pts,removed:0}:dropOutliers(pts);
+  area.innerHTML=chart(o.pts,opts)+(o.removed?`<p class="muted" style="font-size:.76rem;margin-top:8px">${o.removed} extremvärde(n) dolda för tydlighet.</p>`:'');
+}
 
 /* ===== reference + custom plans ===== */
 function refList(plan){return plan.weeks.map(w=>`<details class="wk"><summary><span>${w.label}${w.deload?' · DELOAD':''}</span></summary><div class="body">${w.sessions.map(s=>`<div class="dayrow">${s.day?`<span class="d">${s.day}</span>`:''}<span class="pill ${typeCls(s.type)}">${s.type}</span><span>${s.desc}</span></div>`).join('')}</div></details>`).join('');}
